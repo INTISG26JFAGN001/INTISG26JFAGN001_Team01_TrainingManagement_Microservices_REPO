@@ -78,8 +78,12 @@ public class UsersDAOImpl implements IUsersDAO{
     @Override
     public Users updateUser(Users user) throws UserNotFoundException {
         Users existingUser = this.getUserByUsername(user.getUsername());
+        existingUser.setFullName(user.getFullName());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setRoles(user.getRoles());
         return usersRepository.save(user);
     }
+
 
     @Override
     public Users deleteUserById(long id) throws UserNotFoundException {
