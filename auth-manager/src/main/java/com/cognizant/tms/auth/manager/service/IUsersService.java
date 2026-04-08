@@ -6,7 +6,7 @@ import com.cognizant.tms.auth.manager.model.Users;
 import java.util.List;
 
 public interface IUsersService {
-    boolean createUser(Users user) throws Exception;
+    boolean createUser(Users user) throws UserNotFoundException;
     Users getUserById(long id) throws UserNotFoundException;
     List<Users> getAllUsers();
     Users getUserByEmail(String email) throws UserNotFoundException;
