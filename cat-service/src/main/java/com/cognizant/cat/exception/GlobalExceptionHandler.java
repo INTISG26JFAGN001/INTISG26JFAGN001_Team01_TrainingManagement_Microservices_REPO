@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
                                                                              HttpServletRequest request){
         ErrorResponseDTO response = new ErrorResponseDTO();
         response.setTimestamp(LocalDateTime.now());
-        response.setErrorCode("A001");
+        response.setErrorCode("S404");
         response.setMessage(ex.getMessage());
         response.setPath(request.getRequestURI());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponseDTO response = new ErrorResponseDTO();
         response.setTimestamp(LocalDateTime.now());
-        response.setErrorCode("A002");
+        response.setErrorCode("S400");
         response.setMessage(errorMessage);
         response.setPath(request.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponseDTO response = new ErrorResponseDTO();
         response.setTimestamp(LocalDateTime.now());
-        response.setErrorCode("A003");
+        response.setErrorCode("S500");
         response.setMessage("Something went wrong");
         response.setPath(request.getRequestURI());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
