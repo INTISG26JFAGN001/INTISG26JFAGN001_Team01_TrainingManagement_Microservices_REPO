@@ -2,7 +2,14 @@ package com.cognizant.cat.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
 
-    public ResourceNotFoundException(String message) {
+    private String errorCode;
+
+    public ResourceNotFoundException(String message, String errorCode) {
         super(message);
+        this.errorCode=errorCode;
+    }
+
+    public String getErrorCode(){
+        return errorCode;
     }
 }

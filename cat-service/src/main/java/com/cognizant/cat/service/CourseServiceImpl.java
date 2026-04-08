@@ -28,7 +28,7 @@ public class CourseServiceImpl implements ICourseService{
         Technology tech = techDAO.findById(dto.getTechnologyId());
 
         if(tech==null) {
-            throw new ResourceNotFoundException("Technology not found");
+            throw new ResourceNotFoundException("Technology not found", "V001");
         }
 
         Course course = new Course();
@@ -47,7 +47,7 @@ public class CourseServiceImpl implements ICourseService{
         Course course=courseDAO.findById(id);
 
         if(course == null) {
-            throw new ResourceNotFoundException("Course not found");
+            throw new ResourceNotFoundException("Course not found", "V001");
         }
 
         return mapToDTO(course);
@@ -58,13 +58,13 @@ public class CourseServiceImpl implements ICourseService{
         Course existing = courseDAO.findById(id);
 
         if(existing == null) {
-            throw new ResourceNotFoundException("Course not found");
+            throw new ResourceNotFoundException("Course not found","V001");
         }
 
         Technology tech= techDAO.findById(dto.getTechnologyId());
 
         if(tech == null) {
-            throw new ResourceNotFoundException("Technology not found");
+            throw new ResourceNotFoundException("Technology not found","V001");
         }
 
         existing.setCode(dto.getCode());
@@ -80,7 +80,7 @@ public class CourseServiceImpl implements ICourseService{
         Course course= courseDAO.findById(id);
 
         if(course == null) {
-            throw new ResourceNotFoundException("Course not found");
+            throw new ResourceNotFoundException("Course not found","V001");
         }
 
         courseDAO.delete(id);
