@@ -20,13 +20,17 @@ public class UsersDAOImpl implements IUsersDAO{
 
 
     @Override
-    public boolean createUser(Users user) throws Exception{
-        try {
-            usersRepository.save(user);
-            return true;
-        }catch(Exception e){
-            throw new Exception("User could not be created");
+    public boolean createUser(Users user) throws UserNotFoundException{
+        Optional<Users> existingUserWithUsername = usersRepository.findByUsername(user.getUsername());
+        if(existingUserWithUsername.isPresent()){
+            throw new UserNotFoundException("U002", "User with username: "+user.getUsername()+" already exists");
         }
+        Optional<Users> userWithSameEmail = usersRepository.findByEmail(user.getEmail());
+        if(userWithSameEmail.isPresent()){
+            throw new UserNotFoundException("U003", "User with email: "+user.getEmail()+" already exists");
+        }
+        usersRepository.save(user);
+        return true;
     }
 
     @Override
@@ -36,7 +40,7 @@ public class UsersDAOImpl implements IUsersDAO{
         if(users.isPresent()){
             result = users.get();
         }else{
-            throw new UserNotFoundException("S500", "User with id: "+id+" does not exist");
+            throw new UserNotFoundException("U001", "User with id: "+id+" does not exist");
         }
         return result;
     }
@@ -53,7 +57,7 @@ public class UsersDAOImpl implements IUsersDAO{
         if(users.isPresent()){
             result = users.get();
         }else{
-            throw new UserNotFoundException("S500", "User with email: "+email+" does not exist");
+            throw new UserNotFoundException("U003", "User with email: "+email+" does not exist");
         }
         return result;
     }
@@ -65,7 +69,7 @@ public class UsersDAOImpl implements IUsersDAO{
         if(users.isPresent()){
             result = users.get();
         }else{
-            throw new UserNotFoundException("S500", "User with username: "+username+" does not exist");
+            throw new UserNotFoundException("U002", "User with username: "+username+" does not exist");
         }
         return result;
     }
@@ -77,7 +81,30 @@ public class UsersDAOImpl implements IUsersDAO{
 
     @Override
     public Users updateUser(Users user) throws UserNotFoundException {
+        Optional<Users> existingUserWithId = usersRepository.findById(user.getId());
+        if(existingUserWithId.isEmpty()){
+            throw new UserNotFoundException("U001", "User with id: "+user.getId()+" does not exist");
+        }
+        Optional<Users> existingUserWithUsername = usersRepository.findByUsername(user.getUsername());
+        if(existingUserWithUsername.isPresent() && existingUserWithUsername.get().getId()!=existingUserWithId.get().getId()){
+            throw new UserNotFoundException("U002", "User with username: "+user.getUsername()+" already exists");
+        }
+        Optional<Users> existingUserWithEmail = usersRepository.findByEmail(user.getEmail());
+        if(existingUserWithEmail.isPresent()&& existingUserWithEmail.get().getId()!=existingUserWithId.get().getId()){
+            throw new UserNotFoundException("U003", "User with email: "+user.getEmail()+" already exists");
+        }
+        Users newUser = existingUserWithId.get();
+        newUser.setUsername(user.getUsername());
+        newUser.setFullName(user.getFullName());
+        newUser.setEmail(user.getEmail());
+        newUser.setRoles(user.getRoles());
+        return usersRepository.save(newUser);
+    }
+
+    @Override
+    public Users updateUserPasswordHash(Users user) throws UserNotFoundException {
         Users existingUser = this.getUserByUsername(user.getUsername());
+        existingUser.setPasswordHash(user.getPasswordHash());
         return usersRepository.save(user);
     }
 

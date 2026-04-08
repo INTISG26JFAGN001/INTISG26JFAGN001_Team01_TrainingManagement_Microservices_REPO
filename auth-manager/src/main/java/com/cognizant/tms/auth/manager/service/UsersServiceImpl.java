@@ -18,7 +18,7 @@ public class UsersServiceImpl implements IUsersService{
     }
 
     @Override
-    public boolean createUser(Users user) throws Exception {
+    public boolean createUser(Users user) throws UserNotFoundException {
         return usersDAO.createUser(user);
     }
 

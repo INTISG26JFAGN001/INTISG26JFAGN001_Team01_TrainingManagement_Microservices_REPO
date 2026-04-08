@@ -15,51 +15,61 @@ import java.util.List;
 @RequestMapping("/user")
 public class UsersController {
     private IUsersService usersService;
+    private UserMapper userMapper;
 
     @Autowired
-    public UsersController(IUsersService usersService) {
+    public UsersController(IUsersService usersService, UserMapper userMapper) {
         this.usersService = usersService;
+        this.userMapper = userMapper;
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<UsersDTO>> getAllUsers(){
         List<Users> usersList = usersService.getAllUsers();
-        List<UsersDTO> usersDTOS = usersList.stream().map(u-> UserMapper.mapToUsersDTO(u)).toList();
+        List<UsersDTO> usersDTOS = usersList.stream().map(u-> userMapper.mapToUsersDTO(u)).toList();
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(usersDTOS);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UsersDTO> getById(@PathVariable long id){
         Users users = usersService.getUserById(id);
-        UsersDTO usersDTO = UserMapper.mapToUsersDTO(users);
+        UsersDTO usersDTO = userMapper.mapToUsersDTO(users);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(usersDTO);
     }
 
     @GetMapping("/username")
     public ResponseEntity<UsersDTO> getByUsername(@RequestParam("key") String username){
         Users users = usersService.getUserByUsername(username);
-        UsersDTO usersDTO = UserMapper.mapToUsersDTO(users);
+        UsersDTO usersDTO = userMapper.mapToUsersDTO(users);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(usersDTO);
     }
 
     @GetMapping("/email")
     public ResponseEntity<UsersDTO> getByEmail(@RequestParam("key") String email){
         Users users = usersService.getUserByEmail(email);
-        UsersDTO usersDTO = UserMapper.mapToUsersDTO(users);
+        UsersDTO usersDTO = userMapper.mapToUsersDTO(users);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(usersDTO);
     }
 
     @GetMapping("/name")
     public ResponseEntity<List<UsersDTO>> getAllUsers(@RequestParam("key") String fullname){
         List<Users> usersList = usersService.getUsersByFullName(fullname);
-        List<UsersDTO> usersDTOS = usersList.stream().map(u-> UserMapper.mapToUsersDTO(u)).toList();
+        List<UsersDTO> usersDTOS = usersList.stream().map(u-> userMapper.mapToUsersDTO(u)).toList();
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(usersDTOS);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<UsersDTO> updateUser(@RequestBody UsersDTO usersDTO){
+        Users users = userMapper.mapToUsers(usersDTO);
+        Users updatedUser = usersService.updateUser(users);
+        UsersDTO updatedUserDTO = userMapper.mapToUsersDTO(updatedUser);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedUserDTO);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<UsersDTO> deleteUser(@PathVariable long id){
         Users users = usersService.deleteUserById(id);
-        UsersDTO usersDTO = UserMapper.mapToUsersDTO(users);
+        UsersDTO usersDTO = userMapper.mapToUsersDTO(users);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(usersDTO);
     }
 }

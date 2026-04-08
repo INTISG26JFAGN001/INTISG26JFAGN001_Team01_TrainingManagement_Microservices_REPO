@@ -51,6 +51,7 @@ public class GlobalExceptionHandler {
         response.setErrorCode("S500");
         response.setMessage("Error Occured");
         response.setPath(request.getRequestURI());
+        ex.printStackTrace();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 }

@@ -3,13 +3,10 @@ package com.cognizant.tms.auth.manager.dto;
 import com.cognizant.tms.auth.manager.model.Roles;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
-public class UsersDTO {
-    private long id;
+public class CreateUsersDTO {
     @NotBlank(message = "${user.dto.username.notblank}")
     private String username;
     @NotBlank(message = "${user.dto.fullname.notblank}")
@@ -18,25 +15,16 @@ public class UsersDTO {
     @Email(message = "${user.dto.email.invalid}")
     private String email;
 
-    private List<String> roles;
+    private List<Roles> roles;
 
-    public UsersDTO() {
+    public CreateUsersDTO() {
     }
 
-    public UsersDTO(long id, String username, String fullName, String email, List<String> roles) {
-        this.id = id;
+    public CreateUsersDTO(String username, String fullName, String email, List<Roles> roles) {
         this.username = username;
         this.fullName = fullName;
         this.email = email;
         this.roles = roles;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getUsername() {
@@ -63,11 +51,11 @@ public class UsersDTO {
         this.email = email;
     }
 
-    public List<String> getRoles() {
+    public List<Roles> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<String> roles) {
+    public void setRoles(List<Roles> roles) {
         this.roles = roles;
     }
 }
