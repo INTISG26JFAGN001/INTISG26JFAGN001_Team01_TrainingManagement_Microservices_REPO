@@ -1,14 +1,12 @@
 package com.cognizant.cat.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class ErrorResponseDTO {
     private LocalDateTime timestamp;
     private String message;
     private String errorCode;
     private String path;
-    private List<String> errors;
 
     public ErrorResponseDTO() {
     }

@@ -38,7 +38,7 @@ public class TechnologyServiceImpl implements ITechnologyService {
         Technology tech = techDAO.findById(id);
 
         if (tech == null) {
-            throw new ResourceNotFoundException("Technology not found","V001");
+            throw new ResourceNotFoundException("Technology not found","R001");
         }
 
         return mapToDTO(tech);
@@ -49,7 +49,7 @@ public class TechnologyServiceImpl implements ITechnologyService {
         Technology existing = techDAO.findById(id);
 
         if (existing == null) {
-            throw new ResourceNotFoundException("Technology not found","V001");
+            throw new ResourceNotFoundException("Technology not found","R001");
         }
 
         existing.setName(dto.getName());
@@ -59,7 +59,7 @@ public class TechnologyServiceImpl implements ITechnologyService {
 
     public void delete(Long id) {
         if (techDAO.findById(id) == null) {
-            throw new ResourceNotFoundException("Technology not found","V001");
+            throw new ResourceNotFoundException("Technology not found","R001");
         }
         techDAO.delete(id);
     }
