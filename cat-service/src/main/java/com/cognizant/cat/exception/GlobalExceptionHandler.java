@@ -1,49 +1,52 @@
 package com.cognizant.cat.exception;
 
-import com.cognizant.cat.dto.ApiResponse;
+import com.cognizant.cat.dto.ErrorResponseDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import java.time.LocalDateTime;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
-
-        ErrorResponse error = new ErrorResponse(
-                ex.getMessage(),
-                HttpStatus.NOT_FOUND.value()
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    public ResponseEntity<ErrorResponseDTO> handleResourceNotFoundException(ResourceNotFoundException ex,
+                                                                             HttpServletRequest request){
+        ErrorResponseDTO response = new ErrorResponseDTO();
+        response.setTimestamp(LocalDateTime.now());
+        response.setErrorCode(ex.getErrorCode());
+        response.setMessage(ex.getMessage());
+        response.setPath(request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponseDTO> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
 
         String errorMessage = ex.getBindingResult()
                 .getFieldErrors()
                 .get(0)
                 .getDefaultMessage();
 
-        ErrorResponse error = new ErrorResponse(
-                errorMessage,
-                HttpStatus.BAD_REQUEST.value()
-        );
-
-        return ResponseEntity.badRequest().body(error);
+        ErrorResponseDTO response = new ErrorResponseDTO();
+        response.setTimestamp(LocalDateTime.now());
+        response.setErrorCode("V001");
+        response.setMessage(errorMessage);
+        response.setPath(request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
+    public ResponseEntity<ErrorResponseDTO> handleGeneric(Exception ex, HttpServletRequest request) {
 
-        ErrorResponse error = new ErrorResponse(
-                "Something went wrong",
-                HttpStatus.INTERNAL_SERVER_ERROR.value()
-        );
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        ErrorResponseDTO response = new ErrorResponseDTO();
+        response.setTimestamp(LocalDateTime.now());
+        response.setErrorCode("S500");
+        response.setMessage("Something went wrong");
+        response.setPath(request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }

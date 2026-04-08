@@ -28,7 +28,7 @@ public class StageServiceImpl implements IStageService {
         Course course = courseDAO.findById(dto.getCourseId());
 
         if (course == null) {
-            throw new ResourceNotFoundException("Course not found");
+            throw new ResourceNotFoundException("Course not found","R001");
         }
 
         Stage stage = new Stage();
@@ -51,7 +51,7 @@ public class StageServiceImpl implements IStageService {
         Stage stage = stageDAO.findById(id);
 
         if (stage == null) {
-            throw new ResourceNotFoundException("Stage not found");
+            throw new ResourceNotFoundException("Stage not found","R001");
         }
 
         return mapToDTO(stage);
@@ -62,13 +62,13 @@ public class StageServiceImpl implements IStageService {
         Stage existing = stageDAO.findById(id);
 
         if (existing == null) {
-            throw new ResourceNotFoundException("Stage not found");
+            throw new ResourceNotFoundException("Stage not found","R001");
         }
 
         Course course = courseDAO.findById(dto.getCourseId());
 
         if (course == null) {
-            throw new ResourceNotFoundException("Course not found");
+            throw new ResourceNotFoundException("Course not found","R001");
         }
 
         existing.setName(dto.getName());
@@ -81,7 +81,7 @@ public class StageServiceImpl implements IStageService {
 
     public void delete(Long id) {
         if (stageDAO.findById(id) == null) {
-            throw new ResourceNotFoundException("Stage not found");
+            throw new ResourceNotFoundException("Stage not found","R001");
         }
         stageDAO.delete(id);
     }
