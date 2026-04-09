@@ -18,12 +18,12 @@ public class UsersDTO {
     @Email(message = "${user.dto.email.invalid}")
     private String email;
 
-    private List<Roles> roles;
+    private List<String> roles;
 
     public UsersDTO() {
     }
 
-    public UsersDTO(long id, String username, String fullName, String email, List<Roles> roles) {
+    public UsersDTO(long id, String username, String fullName, String email, List<String> roles) {
         this.id = id;
         this.username = username;
         this.fullName = fullName;
@@ -63,11 +63,11 @@ public class UsersDTO {
         this.email = email;
     }
 
-    public List<Roles> getRoles() {
+    public List<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Roles> roles) {
+    public void setRoles(List<String> roles) {
         this.roles = roles;
     }
 }
