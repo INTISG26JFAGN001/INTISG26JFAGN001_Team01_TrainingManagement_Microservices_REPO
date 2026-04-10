@@ -17,13 +17,11 @@ public class EvaluationController {
     private EvaluationService evaluationService;
 
     @GetMapping("/batch/{batchId}")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
     public ResponseEntity<List<EvaluationResponseDTO>> getBatchEvaluations(@PathVariable Long batchId) {
         return ResponseEntity.ok(evaluationService.getEvaluationsByBatch(batchId));
     }
 
     @GetMapping("/batch/{batchId}/associate/{associateId}")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER', 'COACH')")
     public ResponseEntity<EvaluationResponseDTO> getAssociateEvaluation(
             @PathVariable Long batchId,
             @PathVariable Long associateId) {
@@ -31,7 +29,6 @@ public class EvaluationController {
     }
 
     @PostMapping("/batch/{batchId}/calculate")
-//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> runAggregation(@PathVariable Long batchId) {
         evaluationService.calculateBatchPerformance(batchId);
         // KAFKA: Publish EvaluationUpdated event here [cite: 63, 103]

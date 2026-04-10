@@ -20,7 +20,6 @@ public class ReviewController {
 
 
     @PostMapping("/project/{projectId}")
-//    @PreAuthorize("hasAnyRole('TECH_LEAD', 'SCRUM_LEAD')")
     public ResponseEntity<ReviewResponseDTO> submitReview(
             @PathVariable Long projectId,
             @Valid @RequestBody ReviewRequestDTO request) {
@@ -33,14 +32,12 @@ public class ReviewController {
 
 
     @GetMapping("/{reviewId}")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER', 'TECH_LEAD', 'SCRUM_LEAD')")
     public ResponseEntity<ReviewResponseDTO> getReviewById(@PathVariable Long reviewId) {
         return ResponseEntity.ok(reviewService.getReviewById(reviewId));
     }
 
 
     @PutMapping("/{reviewId}")
-//    @PreAuthorize("hasAnyRole('TECH_LEAD', 'SCRUM_LEAD')")
     public ResponseEntity<ReviewResponseDTO> updateReview(
             @PathVariable Long reviewId,
             @Valid @RequestBody ReviewRequestDTO request) {
@@ -53,7 +50,6 @@ public class ReviewController {
 
 
     @DeleteMapping("/{reviewId}")
-//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId) {
         reviewService.deleteReview(reviewId);
         return ResponseEntity.noContent().build();
@@ -61,7 +57,6 @@ public class ReviewController {
 
 
     @GetMapping("/project/{projectId}/all")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER', 'TECH_LEAD', 'SCRUM_LEAD')")
     public ResponseEntity<List<ReviewResponseDTO>> getReviewsByProject(@PathVariable Long projectId) {
         return ResponseEntity.ok(reviewService.getReviewsByProject(projectId));
     }
