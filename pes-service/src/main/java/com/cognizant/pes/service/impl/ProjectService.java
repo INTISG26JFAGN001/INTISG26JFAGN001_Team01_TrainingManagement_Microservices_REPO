@@ -1,11 +1,12 @@
-package com.cognizant.pes.service;
+package com.cognizant.pes.service.impl;
 
-import com.cognizant.pes.dao.ProjectDAOImpl;
+import com.cognizant.pes.dao.impl.ProjectDAOImpl;
 import com.cognizant.pes.domain.Project;
-import com.cognizant.pes.dto.ProjectRequestDTO;
-import com.cognizant.pes.dto.ProjectResponseDTO;
+import com.cognizant.pes.dto.request.ProjectRequestDTO;
+import com.cognizant.pes.dto.response.ProjectResponseDTO;
 import com.cognizant.pes.exception.ResourceNotFoundException;
 import com.cognizant.pes.mapper.ProjectMapper;
+import com.cognizant.pes.service.IProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ public class ProjectService implements IProjectService {
     @Autowired
     private ProjectDAOImpl projectDAO;
 
-    @Autowired  // <--- ADD THIS LINE HERE
+    @Autowired
     private ProjectMapper projectMapper;
 
     @Override
@@ -29,7 +30,6 @@ public class ProjectService implements IProjectService {
 
     @Override
     public ProjectResponseDTO saveProject(ProjectRequestDTO request) {
-        // Without @Autowired above, projectMapper is null, causing your crash here
         Project project = projectMapper.toDomain(request);
         Project savedProject = projectDAO.saveProject(project);
         return projectMapper.toDto(savedProject);
@@ -38,7 +38,6 @@ public class ProjectService implements IProjectService {
     @Override
     public List<ProjectResponseDTO> getAllProjects() {
         List<Project> projects = projectDAO.findAll();
-        // Convert the List of Entities to a List of DTOs using the mapper
         return projects.stream()
                 .map(projectMapper::toDto)
                 .collect(Collectors.toList());
@@ -46,7 +45,6 @@ public class ProjectService implements IProjectService {
 
     @Override
     public void deleteProject(Long id) {
-        // Ensure the project exists before attempting deletion (optional but recommended)
         Project project = projectDAO.findById(id);
         if (project != null) {
             projectDAO.delete(id);
@@ -55,19 +53,19 @@ public class ProjectService implements IProjectService {
 
     @Override
     public ProjectResponseDTO updateProject(Long id, ProjectRequestDTO request) throws ResourceNotFoundException{
-        // 1. Fetch existing project
+
         Project existingProject = projectDAO.findById(id);
 
         if (existingProject != null) {
-            // 2. Update fields from the request DTO
+
             existingProject.setTitle(request.title());
             existingProject.setBatchId(request.batchId());
             existingProject.setRepoUrl(request.repoUrl());
 
-            // 3. Save the updated entity
+
             Project updatedProject = projectDAO.saveProject(existingProject);
 
-            // 4. Return the mapped Response DTO
+
             return projectMapper.toDto(updatedProject);
         }
 

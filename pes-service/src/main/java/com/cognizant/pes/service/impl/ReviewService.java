@@ -1,10 +1,11 @@
-package com.cognizant.pes.service;
+package com.cognizant.pes.service.impl;
 
-import com.cognizant.pes.dao.ReviewDAOImpl;
-import com.cognizant.pes.dto.ReviewRequestDTO;
-import com.cognizant.pes.dto.ReviewResponseDTO;
+import com.cognizant.pes.dao.impl.ReviewDAOImpl;
+import com.cognizant.pes.dto.request.ReviewRequestDTO;
+import com.cognizant.pes.dto.response.ReviewResponseDTO;
 import com.cognizant.pes.domain.Review;
 import com.cognizant.pes.mapper.ReviewMapper; // Assuming your mapper name
+import com.cognizant.pes.service.IReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,18 +20,17 @@ public class ReviewService implements IReviewService {
     private ReviewDAOImpl reviewDAO;
 
     @Autowired
-    private ReviewMapper reviewMapper; // Injecting your mapper class
+    private ReviewMapper reviewMapper;
 
     @Override
     @Transactional
     public ReviewResponseDTO saveReview(Long projectId, ReviewRequestDTO request) {
-        // Use mapper to convert DTO to Entity [cite: 50, 52]
+
         Review review = reviewMapper.toDomain(request);
-        review.setProjectId(projectId); // Ensure ID from URL is set
+        review.setProjectId(projectId);
 
         Review savedReview = reviewDAO.save(review);
 
-        // KAFKA: Topic project.events -> Publish ReviewCompleted (ProjectSubmitted/ReviewCompleted) [cite: 63, 103]
 
         return reviewMapper.toDto(savedReview);
     }
@@ -40,7 +40,6 @@ public class ReviewService implements IReviewService {
     public ReviewResponseDTO updateReview(Long reviewId, ReviewRequestDTO request) {
         Review existingReview = reviewDAO.findById(reviewId);
         if (existingReview != null) {
-            // Update fields from request DTO to existing entity
 
 
             Review updatedReview = reviewDAO.update(reviewMapper.toDomain(request));

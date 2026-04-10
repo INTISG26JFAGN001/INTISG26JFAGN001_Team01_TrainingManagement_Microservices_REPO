@@ -1,4 +1,4 @@
-package com.cognizant.pes.dto;
+package com.cognizant.pes.dto.request;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

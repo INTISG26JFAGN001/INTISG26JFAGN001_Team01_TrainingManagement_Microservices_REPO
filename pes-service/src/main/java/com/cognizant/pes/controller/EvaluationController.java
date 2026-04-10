@@ -1,7 +1,7 @@
 package com.cognizant.pes.controller;
 
-import com.cognizant.pes.dto.EvaluationResponseDTO;
-import com.cognizant.pes.service.EvaluationService;
+import com.cognizant.pes.dto.response.EvaluationResponseDTO;
+import com.cognizant.pes.service.impl.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,7 +16,6 @@ public class EvaluationController {
     @Autowired
     private EvaluationService evaluationService;
 
-    // US-09: View evaluation reports for a batch
     @GetMapping("/batch/{batchId}")
 //    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
     public ResponseEntity<List<EvaluationResponseDTO>> getBatchEvaluations(@PathVariable Long batchId) {

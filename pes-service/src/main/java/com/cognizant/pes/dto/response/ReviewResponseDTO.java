@@ -1,4 +1,4 @@
-package com.cognizant.pes.dto;
+package com.cognizant.pes.dto.response;
 
 public record ReviewResponseDTO(
         Long reviewerId,

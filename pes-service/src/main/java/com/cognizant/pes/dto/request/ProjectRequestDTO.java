@@ -1,12 +1,9 @@
-package com.cognizant.pes.dto;
+package com.cognizant.pes.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
-/**
- * DTO for incoming project submission requests.
- * Maps to the Project entity fields: title, batch_id, and repo_url[cite: 51].
- */
+
 public record ProjectRequestDTO(
         @NotBlank(message = "Project title is required")
         String title,

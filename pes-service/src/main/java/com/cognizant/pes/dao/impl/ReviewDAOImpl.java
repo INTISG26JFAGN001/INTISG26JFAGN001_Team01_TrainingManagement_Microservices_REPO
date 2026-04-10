@@ -1,13 +1,14 @@
-package com.cognizant.pes.dao;
+package com.cognizant.pes.dao.impl;
 
+import com.cognizant.pes.dao.IReviewDAO;
 import com.cognizant.pes.domain.Review;
 import com.cognizant.pes.repository.IReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Repository
+@Component
 public class ReviewDAOImpl implements IReviewDAO {
 
     @Autowired
@@ -15,13 +16,11 @@ public class ReviewDAOImpl implements IReviewDAO {
 
     @Override
     public Review save(Review review) {
-        // JPA handles ID generation and persistence [cite: 18]
         return reviewRepository.save(review);
     }
 
     @Override
     public Review update(Review existingReview) {
-        // In JPA, save() acts as an update if the ID is present
         return reviewRepository.save(existingReview);
     }
 
@@ -42,7 +41,7 @@ public class ReviewDAOImpl implements IReviewDAO {
 
 
 
-    // Supporting the service layer's delete requirement
+
     public void deleteById(Long reviewId) {
         reviewRepository.deleteById(reviewId);
     }

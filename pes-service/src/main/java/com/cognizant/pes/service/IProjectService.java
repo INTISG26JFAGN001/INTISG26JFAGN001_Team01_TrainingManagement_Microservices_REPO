@@ -1,7 +1,7 @@
 package com.cognizant.pes.service;
 
-import com.cognizant.pes.dto.ProjectRequestDTO;
-import com.cognizant.pes.dto.ProjectResponseDTO;
+import com.cognizant.pes.dto.request.ProjectRequestDTO;
+import com.cognizant.pes.dto.response.ProjectResponseDTO;
 import com.cognizant.pes.exception.ResourceNotFoundException;
 
 import java.util.List;

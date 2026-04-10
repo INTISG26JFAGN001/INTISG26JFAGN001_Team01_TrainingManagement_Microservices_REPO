@@ -1,8 +1,8 @@
 package com.cognizant.pes.mapper;
 
 import com.cognizant.pes.domain.Review;
-import com.cognizant.pes.dto.ReviewRequestDTO;
-import com.cognizant.pes.dto.ReviewResponseDTO;
+import com.cognizant.pes.dto.request.ReviewRequestDTO;
+import com.cognizant.pes.dto.response.ReviewResponseDTO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel="spring")

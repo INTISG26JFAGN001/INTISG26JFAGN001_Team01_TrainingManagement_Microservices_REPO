@@ -1,9 +1,9 @@
 package com.cognizant.pes.controller;
 
-import com.cognizant.pes.dto.ProjectRequestDTO;
-import com.cognizant.pes.dto.ProjectResponseDTO;
+import com.cognizant.pes.dto.request.ProjectRequestDTO;
+import com.cognizant.pes.dto.response.ProjectResponseDTO;
 import com.cognizant.pes.exception.ResourceNotFoundException;
-import com.cognizant.pes.service.ProjectService;
+import com.cognizant.pes.service.impl.ProjectService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,14 +33,14 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
-    // 3. Get all Projects (Useful for Instructors/Admins)
+    // 3. Get all Projects
     @GetMapping("/getProjects")
     public ResponseEntity<List<ProjectResponseDTO>> getAllProjects() {
         List<ProjectResponseDTO> projects = projectService.getAllProjects();
         return ResponseEntity.ok(projects);
     }
 
-    // 4. Update an existing Project (e.g., correcting a Repo URL)
+    // 4. Update an existing Project
     @PutMapping("/update/{projectId}")
     public ResponseEntity<ProjectResponseDTO> updateProject(
             @PathVariable Long projectId,
@@ -53,6 +53,6 @@ public class ProjectController {
     @DeleteMapping("/delete/{projectId}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long projectId) {
         projectService.deleteProject(projectId);
-        return ResponseEntity.noContent().build(); // Returns 204 No Content
+        return ResponseEntity.noContent().build();
     }
 }

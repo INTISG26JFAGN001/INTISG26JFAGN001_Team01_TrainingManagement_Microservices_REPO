@@ -1,7 +1,7 @@
 package com.cognizant.pes.service;
 
-import com.cognizant.pes.dto.ReviewRequestDTO;
-import com.cognizant.pes.dto.ReviewResponseDTO;
+import com.cognizant.pes.dto.request.ReviewRequestDTO;
+import com.cognizant.pes.dto.response.ReviewResponseDTO;
 import jakarta.validation.Valid;
 
 import java.util.List;

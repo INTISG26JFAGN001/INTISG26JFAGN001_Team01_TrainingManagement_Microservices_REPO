@@ -1,14 +1,15 @@
-package com.cognizant.pes.dao;
+package com.cognizant.pes.dao.impl;
 
+import com.cognizant.pes.dao.IProjectDAO;
 import com.cognizant.pes.domain.Project;
 import com.cognizant.pes.repository.IProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Repository
-public class ProjectDAOImpl implements IProjectDAO{
+@Component
+public class ProjectDAOImpl implements IProjectDAO {
 
     @Autowired
     private IProjectRepository projectRepository;
@@ -31,9 +32,8 @@ public class ProjectDAOImpl implements IProjectDAO{
 
     @Override
     public Project updateProject(Long id, Project project) {
-        // In JPA, save() performs an update if the entity has an existing ID
         if (projectRepository.existsById(id)) {
-            project.setId(id); // Ensure the ID matches the path variable
+            project.setId(id);
             return projectRepository.save(project);
         }
         return null;

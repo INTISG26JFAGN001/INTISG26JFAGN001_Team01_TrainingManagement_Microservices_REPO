@@ -1,6 +1,6 @@
 package com.cognizant.pes.service;
 
-import com.cognizant.pes.dto.EvaluationResponseDTO;
+import com.cognizant.pes.dto.response.EvaluationResponseDTO;
 
 import java.util.List;
 
