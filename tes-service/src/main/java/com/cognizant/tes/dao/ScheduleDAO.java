@@ -39,6 +39,6 @@ public class ScheduleDAO implements IScheduleDAO{
 
 
     public List<Schedule> findSchedulesByBatchId(Long batchId) {
-        return scheduleRepository.findByBatch_BatchId(batchId);
+        return scheduleRepository.findByBatchId(batchId);
     }
 }

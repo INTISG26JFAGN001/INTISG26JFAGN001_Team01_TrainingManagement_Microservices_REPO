@@ -1,5 +1,6 @@
 package com.cognizant.tes.mapper;
 
+import com.cognizant.tes.client.ICourseServiceClient;
 import com.cognizant.tes.dto.TrainerDTO;
 import com.cognizant.tes.dto.TrainerTechnologyDTO;
 import com.cognizant.tes.entity.Trainer;
@@ -11,14 +12,16 @@ public class TrainerMapper {
 
 
 
-    public static TrainerDTO toDTO(Trainer trainer, List<Long> technologyIds) {
+    public static TrainerDTO toDTO(Trainer trainer, List<Long> technologyIds, List<String> technologyNames) {
         if (trainer == null) return null;
         TrainerDTO dto = new TrainerDTO();
         dto.setTrainerId(trainer.getTrainerId());
         dto.setUserId(trainer.getUserId());
         dto.setTechnologyIds(technologyIds);
+        dto.setTechnologyNames(technologyNames);
         return dto;
     }
+
 
 
     public static Trainer toEntity(TrainerDTO dto) {

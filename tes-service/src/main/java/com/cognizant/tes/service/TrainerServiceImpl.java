@@ -1,7 +1,9 @@
 package com.cognizant.tes.service;
 
+import com.cognizant.tes.client.ICourseServiceClient;
 import com.cognizant.tes.dao.ITrainerDAO;
 import com.cognizant.tes.dao.ITrainerTechnologyDAO;
+import com.cognizant.tes.dto.TechnologyResponseDTO;
 import com.cognizant.tes.entity.Trainer;
 import com.cognizant.tes.entity.TrainerTechnology;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +20,12 @@ public class TrainerServiceImpl implements ITrainerService {
 
     private ITrainerDAO trainerDAO;
     private ITrainerTechnologyDAO trainerTechnologyDAO;
+    private final ICourseServiceClient courseServiceClient;
 
-    public TrainerServiceImpl(ITrainerDAO trainerDAO, ITrainerTechnologyDAO trainerTechnologyDAO) {
+    public TrainerServiceImpl(ITrainerDAO trainerDAO, ITrainerTechnologyDAO trainerTechnologyDAO, ICourseServiceClient courseServiceClient) {
             this.trainerDAO = trainerDAO;
             this.trainerTechnologyDAO = trainerTechnologyDAO;
+            this.courseServiceClient = courseServiceClient;
     }
 
     public Trainer addTrainer(Trainer trainer, List<Long> technologyIds) {
@@ -68,6 +72,17 @@ public class TrainerServiceImpl implements ITrainerService {
         }
 
         return trainer;
+    }
+
+    public List<TechnologyResponseDTO> getTechnologiesForTrainer(Long trainerId) {
+        List<Long> technologyIds = trainerTechnologyDAO.findByTrainerId(trainerId)
+                .stream()
+                .map(TrainerTechnology::getTechnologyId)
+                .toList();
+
+        return technologyIds.stream()
+                .map(courseServiceClient::getTechnologyById)
+                .toList();
     }
 
 }
