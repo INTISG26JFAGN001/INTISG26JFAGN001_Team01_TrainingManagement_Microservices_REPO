@@ -11,6 +11,6 @@ import java.util.List;
 @FeignClient(name="asm-service")
 public interface AsmRubricClient {
 
-    @GetMapping("/assessments/interview/{interviewId}/rubrics")
+    @GetMapping("/assessments/{interviewId}/rubrics")
     List<RubricResponseDTO> getRubricsForInterview(@PathVariable("interviewId") Long interviewId);
 }
