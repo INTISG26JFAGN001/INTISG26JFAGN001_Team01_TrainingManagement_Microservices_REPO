@@ -103,7 +103,6 @@ public class QuizMapper {
         r.setMaxScore(attempt.getQuiz().getMaxScore());
         r.setPassingMarks(attempt.getQuiz().getPassingMarks());
         r.setResultStatus(attempt.getResultStatus());
-        r.setFeedback(attempt.getFeedback());
         r.setSubmitted(attempt.isSubmitted());
         r.setSubmittedAt(attempt.getSubmittedAt());
         List<QuizAttemptAnswerResponse> answerResponses = attempt.getAnswers().stream()

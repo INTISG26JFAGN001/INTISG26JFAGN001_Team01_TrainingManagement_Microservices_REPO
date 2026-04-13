@@ -32,9 +32,4 @@ public class QuizDAOImpl implements QuizDAO {
     public Quiz save(Quiz quiz) {
         return quizRepository.save(quiz);
     }
-
-    @Override
-    public void deleteById(Long id) {
-        quizRepository.deleteById(id);
-    }
 }

@@ -91,33 +91,6 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     @Transactional
-    public QuizDetailResponse updateQuiz(Long quizId, UpdateAssessmentRequest request) {
-        Quiz quiz = findQuizOrThrow(quizId);
-        if(request.getTitle() != null) {
-            quiz.setTitle(request.getTitle());
-        }
-        if(request.getDueDate() != null){
-            quiz.setDueDate(request.getDueDate());
-        }
-        if(request.getMaxScore() != null){
-            quiz.setMaxScore(request.getMaxScore());
-        }
-        if(request.getStatus() != null){
-            quiz.setStatus(request.getStatus());
-        }
-        Quiz saved = quizDAO.save(quiz);
-        return quizMapper.toDetailResponse(saved);
-    }
-
-    @Override
-    @Transactional
-    public void deleteQuiz(Long quizId) {
-        Quiz quiz = findQuizOrThrow(quizId);
-        quizDAO.deleteById(quizId);
-    }
-
-    @Override
-    @Transactional
     public QuizAttemptResultResponse attemptQuiz(Long quizId, QuizAttemptRequest request) {
         Quiz quiz = findQuizOrThrow(quizId);
 
@@ -125,12 +98,12 @@ public class QuizServiceImpl implements QuizService {
             throw new AssessmentNotAvailableException(quizId);
         }
 
-        if(quizAttemptDAO.existsByAssessmentIdAndAssociateId(quizId, request.getAssociateId())) {
+        if(quizAttemptDAO.existsByQuizIdAndAssociateId(quizId, request.getAssociateId())) {
             throw new DuplicateAttemptException(quizId, request.getAssociateId());
         }
 
         Map<Long, QuizQuestion> quizQuestionMap = quiz.getQuestions().stream()
-                .collect(Collectors.toMap(q -> q.getId(), q -> q));
+                .collect(Collectors.toMap(QuizQuestion::getId, q -> q));
 
         int totalScore = 0;
         List<QuizAttemptAnswer> attemptAnswers = new ArrayList<>();
@@ -176,7 +149,7 @@ public class QuizServiceImpl implements QuizService {
     @Override
     @Transactional(readOnly = true)
     public QuizAttemptResultResponse getAttemptResult(Long quizId, Long associateId) {
-        QuizAttempt attempt = quizAttemptDAO.findByAssessmentIdAndAssociateId(quizId, associateId)
+        QuizAttempt attempt = quizAttemptDAO.findByQuizIdAndAssociateId(quizId, associateId)
                 .orElseThrow(() -> new AttemptNotFoundException(quizId, associateId));
         return quizMapper.toAttemptResultResponse(attempt);
     }
@@ -185,7 +158,7 @@ public class QuizServiceImpl implements QuizService {
     @Transactional(readOnly = true)
     public List<QuizAttemptResultResponse> getAllAttempts(Long quizId) {
         findQuizOrThrow(quizId);
-        return quizAttemptDAO.findByAssessmentId(quizId).stream()
+        return quizAttemptDAO.findByQuizId(quizId).stream()
                 .map(quizMapper::toAttemptResultResponse)
                 .collect(Collectors.toList());
     }

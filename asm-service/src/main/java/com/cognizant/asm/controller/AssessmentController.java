@@ -52,11 +52,6 @@ public class AssessmentController {
         return ResponseEntity.ok(assessmentService.listByBatchAndStatus(batchId, status));
     }
 
-    @GetMapping("/batches/{batchId}/assessments")
-    public ResponseEntity<List<AssessmentSummaryResponse>> listAssessmentsForBatch(@PathVariable Long batchId) {
-        return ResponseEntity.ok(assessmentService.listByBatch(batchId));
-    }
-
     @PatchMapping("/{assessmentId}")
     public ResponseEntity<AssessmentSummaryResponse> updateAssessment(@PathVariable Long assessmentId, @Valid @RequestBody UpdateAssessmentRequest request) {
         return ResponseEntity.ok(assessmentService.updateAssessment(assessmentId, request));

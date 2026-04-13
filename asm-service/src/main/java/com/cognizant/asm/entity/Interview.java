@@ -18,9 +18,6 @@ public class Interview extends Assessment {
     @Column(name = "interview_category")
     private InterviewCategory interviewCategory;
 
-    @Column(name = "total_marks")
-    private Integer totalMarks = 100;
-
     @Column(name = "scheduled_date_time")
     private LocalDateTime scheduledDateTime;
 
