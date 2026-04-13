@@ -44,17 +44,17 @@ public class QuizAttemptDAOImpl implements QuizAttemptDAO {
     }
 
     @Override
-    public List<QuizAttempt> findByAssessmentId(Long assessmentId) {
-        return quizAttemptRepository.findByAssessmentId(assessmentId);
+    public List<QuizAttempt> findByQuizId(Long quizId) {
+        return quizAttemptRepository.findByQuizId(quizId);
     }
 
     @Override
-    public boolean existsByAssessmentIdAndAssociateId(Long assessmentId, Long associateId) {
-        return quizAttemptRepository.existsByAssessmentIdAndAssociateId(assessmentId, associateId);
+    public boolean existsByQuizIdAndAssociateId(Long quizId, Long associateId) {
+        return quizAttemptRepository.existsByQuizIdAndAssociateId(quizId, associateId);
     }
 
     @Override
-    public Optional<QuizAttempt> findByAssessmentIdAndAssociateId(Long assessmentId, Long associateId) {
-        return quizAttemptRepository.findByAssessmentIdAndAssociateId(assessmentId, associateId);
+    public Optional<QuizAttempt> findByQuizIdAndAssociateId(Long quizId, Long associateId) {
+        return quizAttemptRepository.findByQuizIdAndAssociateId(quizId, associateId);
     }
 }

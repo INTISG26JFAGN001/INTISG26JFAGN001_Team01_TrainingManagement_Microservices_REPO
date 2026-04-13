@@ -6,7 +6,6 @@ import com.cognizant.asm.entity.Interview;
 import com.cognizant.asm.enums.AssessmentType;
 import com.cognizant.asm.enums.AssessmentStatus;
 import com.cognizant.asm.dao.AssessmentDAO;
-import com.cognizant.asm.dao.AssessmentResultDAO;
 import com.cognizant.asm.dao.RubricDAO;
 import com.cognizant.asm.service.AssessmentService;
 import com.cognizant.asm.mapper.QuizMapper;
@@ -25,14 +24,12 @@ import java.util.stream.Collectors;
 public class AssessmentServiceImpl implements AssessmentService {
 
     private final AssessmentDAO assessmentDAO;
-    private final AssessmentResultDAO assessmentResultDAO;
     private final RubricDAO rubricDAO;
     private final QuizMapper quizMapper;
     private final InterviewMapper interviewMapper;
 
-    public AssessmentServiceImpl(AssessmentDAO assessmentDAO, AssessmentResultDAO assessmentResultDAO, RubricDAO rubricDAO, QuizMapper quizMapper, InterviewMapper interviewMapper) {
+    public AssessmentServiceImpl(AssessmentDAO assessmentDAO, RubricDAO rubricDAO, QuizMapper quizMapper, InterviewMapper interviewMapper) {
         this.assessmentDAO = assessmentDAO;
-        this.assessmentResultDAO = assessmentResultDAO;
         this.rubricDAO = rubricDAO;
         this.quizMapper = quizMapper;
         this.interviewMapper = interviewMapper;
@@ -119,7 +116,6 @@ public class AssessmentServiceImpl implements AssessmentService {
         Assessment assessment = assessmentDAO.findById(assessmentId)
                 .orElseThrow(() -> new AssessmentNotFoundException(assessmentId));
         rubricDAO.deleteByAssessmentId(assessmentId);
-        assessmentResultDAO.deleteByAssessmentId(assessmentId);
         assessmentDAO.deleteById(assessmentId);
     }
 

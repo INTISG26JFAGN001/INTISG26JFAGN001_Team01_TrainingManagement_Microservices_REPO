@@ -21,4 +21,7 @@ public class Quiz extends Assessment {
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<QuizQuestion> questions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<QuizAttempt> attempts = new ArrayList<>();
 }

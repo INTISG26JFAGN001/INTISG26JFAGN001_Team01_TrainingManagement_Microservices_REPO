@@ -26,7 +26,6 @@ public class InterviewMapper {
         interview.setDueDate(request.getDueDate());
         interview.setMaxScore(request.getMaxScore() != null ? request.getMaxScore() : 100);
         interview.setInterviewCategory(request.getInterviewCategory());
-        interview.setTotalMarks(request.getTotalMarks() != null ? request.getTotalMarks() : 100);
         interview.setScheduledDateTime(request.getScheduledDateTime());
         interview.setEvaluatorRole(request.getEvaluatorRole());
         interview.setStatus(request.getStatus() != null ? request.getStatus() : AssessmentStatus.DRAFT);
@@ -44,7 +43,6 @@ public class InterviewMapper {
         response.setDueDate(interview.getDueDate());
         response.setMaxScore(interview.getMaxScore());
         response.setInterviewCategory(interview.getInterviewCategory());
-        response.setTotalMarks(interview.getTotalMarks());
         response.setScheduledDateTime(interview.getScheduledDateTime());
         response.setEvaluatorRole(interview.getEvaluatorRole());
         response.setCreatedBy(interview.getCreatedBy());
@@ -53,7 +51,7 @@ public class InterviewMapper {
                 .map(this::toRubricResponse)
                 .collect(Collectors.toList());
         response.setRubrics(rubricResponses);
-        // External result — may be null (graceful fallback handled in service / client)
+        // External result from pes
         response.setInterviewResult(externalResult);
         return response;
     }

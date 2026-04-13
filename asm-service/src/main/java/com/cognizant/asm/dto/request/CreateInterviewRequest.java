@@ -16,8 +16,6 @@ public class CreateInterviewRequest {
     @Size(max = 200, message = "Title must not exceed 200 characters")
     private String title;
 
-    private String description;
-
     @NotNull(message = "BatchId iis required")
     private Long batchId;
 
@@ -31,7 +29,6 @@ public class CreateInterviewRequest {
     @NotNull(message = "Interview category (INTERIM/FINAL) is required")
     private InterviewCategory interviewCategory;
 
-    private Integer totalMarks = 100;
     private LocalDateTime scheduledDateTime;
 
     private String evaluatorRole;
