@@ -3,6 +3,7 @@ package com.cognizant.asm.exception;
 import com.cognizant.asm.dto.response.ErrorResponseDTO;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -48,9 +49,20 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request, null);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponseDTO> handleIllegalState(IllegalStateException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request, null);
+    }
+
     @ExceptionHandler(RubricWeightExceededException.class)
     public ResponseEntity<ErrorResponseDTO> handleWeightExceeded(RubricWeightExceededException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(RubricTotalNotHundredException.class)
+    public ResponseEntity<ErrorResponseDTO> handleRubricTotalNotHundred(RubricTotalNotHundredException ex, HttpServletRequest request) {
+        // 422 Unprocessable Entity — rubric weights don't total 100
+        return buildResponse422(ex.getMessage(), request);
     }
 
     // Handles Bean Validation errors (@Valid on request bodies)
@@ -79,5 +91,17 @@ public class GlobalExceptionHandler {
                 fieldErrors
         );
         return ResponseEntity.status(status).body(response);
+    }
+
+    private ResponseEntity<ErrorResponseDTO> buildResponse422(String message, HttpServletRequest request) {
+        ErrorResponseDTO response = new ErrorResponseDTO(
+                LocalDateTime.now(),
+                422,
+                "Unprocessable Entity",
+                message,
+                request.getRequestURI(),
+                null
+        );
+        return ResponseEntity.status(HttpStatusCode.valueOf(422)).body(response);
     }
 }

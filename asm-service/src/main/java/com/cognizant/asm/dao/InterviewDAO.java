@@ -11,7 +11,6 @@ public interface InterviewDAO {
     Optional<Interview> findById(Long id);
     List<Interview> findAll();
     Interview save(Interview interview);
-    void deleteById(Long id);
 
     List<Interview> findByBatchId(Long batchId);
     List<Interview> findByBatchIdAndInterviewCategory(Long batchId, InterviewCategory category);

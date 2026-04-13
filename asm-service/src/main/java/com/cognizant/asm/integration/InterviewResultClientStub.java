@@ -5,6 +5,9 @@ import com.cognizant.asm.dto.response.InterviewResultResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
+import java.util.List;
+import java.util.Collections;
+
 // Stub implementation of InterviewResultClient.
 @Component
 @ConditionalOnProperty(
@@ -26,5 +29,10 @@ public class InterviewResultClientStub implements InterviewResultClient {
                         + "is currently unavailable. Please try again later."
         );
         return fallback;
+    }
+
+    @Override
+    public List<InterviewResultResponse> fetchAllResults(Long assessmentId) {
+        return Collections.emptyList();
     }
 }

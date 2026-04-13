@@ -11,4 +11,5 @@ public interface RubricService {
     List<RubricResponse> getRubricsByAssessment(Long assessmentId);
     int getTotalWeight(Long assessmentId);
     void deleteRubric(Long rubricId);
+    void validateRubricTotalForInterview(Long interviewId);
 }

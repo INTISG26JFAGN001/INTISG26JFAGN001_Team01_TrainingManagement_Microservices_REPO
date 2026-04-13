@@ -21,7 +21,6 @@ public class InterviewDetailResponse {
     private LocalDate dueDate;
     private Integer maxScore;
     private InterviewCategory interviewCategory;
-    private Integer totalMarks;
     private LocalDateTime scheduledDateTime;
     private String evaluatorRole;
     private Long createdBy;

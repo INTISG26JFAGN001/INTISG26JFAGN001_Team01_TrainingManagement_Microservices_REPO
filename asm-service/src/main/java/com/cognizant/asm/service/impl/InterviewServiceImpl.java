@@ -2,13 +2,14 @@ package com.cognizant.asm.service.impl;
 
 import com.cognizant.asm.entity.Interview;
 import com.cognizant.asm.entity.Rubric;
+import com.cognizant.asm.enums.AssessmentStatus;
 import com.cognizant.asm.enums.InterviewCategory;
 import com.cognizant.asm.dao.InterviewDAO;
 import com.cognizant.asm.dao.RubricDAO;
 import com.cognizant.asm.service.InterviewService;
+import com.cognizant.asm.service.RubricService;
 import com.cognizant.asm.mapper.InterviewMapper;
 import com.cognizant.asm.dto.request.CreateInterviewRequest;
-import com.cognizant.asm.dto.request.UpdateAssessmentRequest;
 import com.cognizant.asm.dto.response.AssessmentSummaryResponse;
 import com.cognizant.asm.dto.response.InterviewDetailResponse;
 import com.cognizant.asm.dto.response.InterviewResultResponse;
@@ -26,12 +27,14 @@ public class InterviewServiceImpl implements InterviewService {
 
     private final InterviewDAO interviewDAO;
     private final RubricDAO rubricDAO;
+    private final RubricService rubricService;
     private final InterviewMapper interviewMapper;
     private final InterviewResultClient interviewResultClient;
 
-    public InterviewServiceImpl(InterviewDAO interviewDAO, RubricDAO rubricDAO, InterviewMapper interviewMapper, InterviewResultClient interviewResultClient) {
+    public InterviewServiceImpl(InterviewDAO interviewDAO, RubricDAO rubricDAO, RubricService rubricService, InterviewMapper interviewMapper, InterviewResultClient interviewResultClient) {
         this.interviewDAO = interviewDAO;
         this.rubricDAO = rubricDAO;
+        this.rubricService = rubricService;
         this.interviewMapper = interviewMapper;
         this.interviewResultClient = interviewResultClient;
     }
@@ -49,20 +52,10 @@ public class InterviewServiceImpl implements InterviewService {
 
     @Override
     @Transactional(readOnly = true)
-    public InterviewDetailResponse getInterviewById(Long interviewId, Long associateId) {
+    public InterviewDetailResponse getInterviewById(Long interviewId) {
         Interview interview = findInterviewOrThrow(interviewId);
         List<Rubric> rubrics = rubricDAO.findByAssessmentId(interviewId);
-
-        // Attempt to fetch external result — ALWAYS graceful, never throws
-        InterviewResultResponse externalResult = null;
-        if (associateId != null) {
-            try {
-                externalResult = interviewResultClient.fetchResult(interviewId, associateId);
-            } catch (Exception ex) {
-                externalResult = buildFallbackResult(interviewId, associateId, "External evaluation service is currently unavailable.");
-            }
-        }
-        return interviewMapper.toDetailResponse(interview, rubrics, externalResult);
+        return interviewMapper.toDetailResponse(interview, rubrics, null);
     }
 
     @Override
@@ -83,25 +76,32 @@ public class InterviewServiceImpl implements InterviewService {
 
     @Override
     @Transactional
-    public InterviewDetailResponse updateInterview(Long interviewId, UpdateAssessmentRequest request) {
-        Interview interview = findInterviewOrThrow(interviewId);
-
-        if (request.getTitle() != null)       interview.setTitle(request.getTitle());
-        if (request.getDueDate() != null)     interview.setDueDate(request.getDueDate());
-        if (request.getMaxScore() != null)    interview.setMaxScore(request.getMaxScore());
-        if (request.getStatus() != null)      interview.setStatus(request.getStatus());
-
+    public InterviewDetailResponse publishInterview(Long interviewId) {
+        Interview interview =findInterviewOrThrow(interviewId);
+        rubricService.validateRubricTotalForInterview(interviewId);
+        interview.setStatus(AssessmentStatus.PUBLISHED);
         Interview saved = interviewDAO.save(interview);
-
         List<Rubric> rubrics = rubricDAO.findByAssessmentId(interviewId);
         return interviewMapper.toDetailResponse(saved, rubrics, null);
     }
 
     @Override
-    @Transactional
-    public void deleteInterview(Long interviewId) {
-        Interview interview = findInterviewOrThrow(interviewId);
-        interviewDAO.deleteById(interviewId);
+    @Transactional(readOnly = true)
+    public List<InterviewResultResponse> getInterviewResults(Long interviewId) {
+        findInterviewOrThrow(interviewId);
+        return interviewResultClient.fetchAllResults(interviewId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public InterviewResultResponse getAssociateResult(Long interviewId, Long associateId) {
+        findInterviewOrThrow(interviewId);
+        // Attempt to fetch external result — ALWAYS graceful, never throws
+        try {
+            return interviewResultClient.fetchResult(interviewId, associateId);
+        } catch (Exception ex) {
+            return buildFallbackResult(interviewId, associateId, "External evaluation service is currently unavailable.");
+        }
     }
 
     private Interview findInterviewOrThrow(Long interviewId) {

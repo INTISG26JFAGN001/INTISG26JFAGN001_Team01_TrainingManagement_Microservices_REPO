@@ -3,7 +3,6 @@ package com.cognizant.asm.controller;
 import com.cognizant.asm.enums.AssessmentStatus;
 import com.cognizant.asm.service.QuizService;
 import com.cognizant.asm.dto.request.CreateQuizRequest;
-import com.cognizant.asm.dto.request.UpdateAssessmentRequest;
 import com.cognizant.asm.dto.request.QuizAttemptRequest;
 import com.cognizant.asm.dto.response.AssessmentSummaryResponse;
 import com.cognizant.asm.dto.response.QuizAttemptResultResponse;
@@ -32,13 +31,6 @@ public class QuizController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/batches/{batchId}/assessments/quiz")
-    public ResponseEntity<QuizDetailResponse> createQuizForBatch(@PathVariable Long batchId, @Valid @RequestBody CreateQuizRequest request, @RequestHeader(value = "X-User-Id", defaultValue = "0") Long createdBy) {
-        request.setBatchId(batchId);
-        QuizDetailResponse response = quizService.createQuiz(request, createdBy);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
     @GetMapping("/{quizId}")
     public ResponseEntity<QuizDetailResponse> getQuizById(@PathVariable Long quizId) {
         return ResponseEntity.ok(quizService.getQuizById(quizId));
@@ -52,17 +44,6 @@ public class QuizController {
     @GetMapping("/batch/{batchId}/status/{status}")
     public ResponseEntity<List<AssessmentSummaryResponse>> listByBatchAndStatus(@PathVariable Long batchId, @PathVariable AssessmentStatus status) {
         return ResponseEntity.ok(quizService.listQuizzesByBatchAndStatus(batchId, status));
-    }
-
-    @PatchMapping("/{quizId}")
-    public ResponseEntity<QuizDetailResponse> updateQuiz(@PathVariable Long quizId, @Valid @RequestBody UpdateAssessmentRequest request) {
-        return ResponseEntity.ok(quizService.updateQuiz(quizId, request));
-    }
-
-    @DeleteMapping("/{quizId}")
-    public ResponseEntity<Void> deleteQuiz(@PathVariable Long quizId) {
-        quizService.deleteQuiz(quizId);
-        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{quizId}/attempt")

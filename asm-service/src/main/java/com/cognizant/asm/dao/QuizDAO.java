@@ -10,5 +10,4 @@ public interface QuizDAO {
     Optional<Quiz> findById(Long id);
     List<Quiz> findAll();
     Quiz save(Quiz quiz);
-    void deleteById(Long id);
 }

@@ -17,7 +17,6 @@ public class QuizAttemptResultResponse {
     private Integer maxScore;
     private Integer passingMarks;
     private ResultStatus resultStatus;
-    private String feedback;
     private boolean submitted;
     private LocalDateTime submittedAt;
     private List<QuizAttemptAnswerResponse> answers;

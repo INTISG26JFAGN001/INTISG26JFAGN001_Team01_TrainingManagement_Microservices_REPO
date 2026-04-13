@@ -35,11 +35,6 @@ public class InterviewDAOImpl implements InterviewDAO {
     }
 
     @Override
-    public void deleteById(Long id) {
-        interviewRepository.deleteById(id);
-    }
-
-    @Override
     public List<Interview> findByBatchId(Long batchId) {
         return interviewRepository.findByBatchId(batchId);
     }
