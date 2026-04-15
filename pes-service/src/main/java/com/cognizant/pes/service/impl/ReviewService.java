@@ -76,7 +76,8 @@ public class ReviewService implements IReviewService {
 
     @Override
     public ReviewResponseDTO getReviewById(Long reviewId) {
-        return null;
+        Review review = reviewDAO.findById(reviewId);
+        return (review != null) ? reviewMapper.toDto(review) : null;
     }
 
     @Override
