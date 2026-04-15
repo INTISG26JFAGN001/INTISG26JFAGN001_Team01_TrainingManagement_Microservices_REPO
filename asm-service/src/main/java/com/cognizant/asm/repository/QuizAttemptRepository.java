@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> {
 
     List<QuizAttempt> findByAssociateId(Long associateId);
-    List<QuizAttempt> findByAssessmentId(Long assessmentId);
-    boolean existsByAssessmentIdAndAssociateId(Long assessmentId, Long associateId);
-    Optional<QuizAttempt> findByAssessmentIdAndAssociateId(Long assessmentId, Long associateId);
+    List<QuizAttempt> findByQuizId(Long quizId);
+    boolean existsByQuizIdAndAssociateId(Long quizId, Long associateId);
+    Optional<QuizAttempt> findByQuizIdAndAssociateId(Long quizId, Long associateId);
 }
