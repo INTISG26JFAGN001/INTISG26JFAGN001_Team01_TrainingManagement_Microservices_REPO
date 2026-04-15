@@ -22,7 +22,7 @@ public class Enrollment {
     @Column(name="associate_id")
     private Long associateId;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) //yy
     @Column(name="status")
     private EnrollmentStatus status;
 
