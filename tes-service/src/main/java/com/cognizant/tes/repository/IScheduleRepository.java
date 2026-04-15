@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface IScheduleRepository extends JpaRepository<Schedule,Long> {
-    List<Schedule> findByBatch_BatchId(Long batchId);
+    List<Schedule> findByBatchId(Long batchId);
 }

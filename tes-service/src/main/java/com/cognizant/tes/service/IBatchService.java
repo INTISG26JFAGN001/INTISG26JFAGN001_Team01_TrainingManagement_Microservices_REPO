@@ -2,6 +2,7 @@ package com.cognizant.tes.service;
 
 import com.cognizant.tes.dto.BatchDTO;
 import com.cognizant.tes.dto.BatchDetailsDTO;
+import com.cognizant.tes.dto.CourseResponseDTO;
 import com.cognizant.tes.entity.Batch;
 import com.cognizant.tes.entity.BatchStatus;
 import com.cognizant.tes.exception.InvalidBatchException;
@@ -18,4 +19,5 @@ public interface IBatchService {
     public List<Batch> getBatchesByCourseId(Long course_id);
     public List<Batch> getBatchByTrainerId(Long trainer_id);
     public Batch getBatchDetailsById(Long id);
+    public List<CourseResponseDTO> getCoursesForBatch(Long batchId);
 }

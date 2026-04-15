@@ -1,15 +1,21 @@
 package com.cognizant.tes.dto;
 
 import com.cognizant.tes.entity.BatchStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BatchDTO {
     private Long id;
 
     private Long trainerId;
     private BatchStatus status;
+
+    @NotEmpty(message = "Course IDs must be provided")
     private List<Long> courseIds;
+    private List<String> courseNames;
 
     public Long getId() {
         return id;
@@ -43,5 +49,13 @@ public class BatchDTO {
 
     public void setCourseIds(List<Long> courseIds) {
         this.courseIds = courseIds;
+    }
+
+    public List<String> getCourseNames() {
+        return courseNames;
+    }
+
+    public void setCourseNames(List<String> courseNames) {
+        this.courseNames = courseNames;
     }
 }
