@@ -122,7 +122,7 @@ public class AuthController {
                 String accessToken = authUtil.generateAccessToken(userDetails);
                 String refreshToken = authUtil.generateRefreshToken(userDetails);
                 ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
-                        .httpOnly(false)
+                        .httpOnly(true)
                         .secure(false)
                         .path("/auth/refresh-token")
                         .maxAge(7*24*60*60)
