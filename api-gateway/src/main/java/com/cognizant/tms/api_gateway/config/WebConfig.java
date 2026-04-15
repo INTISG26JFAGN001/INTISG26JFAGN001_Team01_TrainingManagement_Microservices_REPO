@@ -34,16 +34,23 @@ public class WebConfig {
         httpSecurity.cors(cors->cors.configurationSource(corsConfigurationSource()));
         httpSecurity
             .authorizeHttpRequests(auth->{
-                // Allow all OPTIONS requests (CORS preflight)
                 auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
-                auth.requestMatchers("/auth/**").permitAll();
                 auth.requestMatchers(
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/v3/api-docs/**",
                         "/webjars/**"
                 ).permitAll();
-                auth.requestMatchers("/user/all").hasRole("ADMIN");
+                // Auth Controller RBAC
+                auth.requestMatchers(HttpMethod.POST, "/auth/signup").hasRole("ADMIN");
+                auth.requestMatchers(HttpMethod.POST, "/auth/login").permitAll();
+                auth.requestMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll();
+
+                // User Controller RBAC
+                auth.requestMatchers(HttpMethod.GET, "/user/all").hasRole("ADMIN");
+                auth.requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("ADMIN", "TECH_LEAD", "TRAINER", "COACH");
+                auth.requestMatchers(HttpMethod.PUT, "/user/**").hasAnyRole("ADMIN", "COACH");
+                auth.requestMatchers(HttpMethod.DELETE, "/user/**").hasRole("ADMIN");
                 auth.anyRequest().permitAll();
             });
         httpSecurity.csrf(csrf->csrf.disable());

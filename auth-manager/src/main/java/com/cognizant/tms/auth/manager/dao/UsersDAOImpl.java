@@ -3,6 +3,7 @@ package com.cognizant.tms.auth.manager.dao;
 import com.cognizant.tms.auth.manager.exception.UserNotFoundException;
 import com.cognizant.tms.auth.manager.model.Users;
 import com.cognizant.tms.auth.manager.repository.IUsersRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -20,6 +21,7 @@ public class UsersDAOImpl implements IUsersDAO{
 
 
     @Override
+    @Transactional
     public boolean createUser(Users user) throws UserNotFoundException{
         Optional<Users> existingUserWithUsername = usersRepository.findByUsername(user.getUsername());
         if(existingUserWithUsername.isPresent()){
@@ -34,6 +36,7 @@ public class UsersDAOImpl implements IUsersDAO{
     }
 
     @Override
+    @Transactional
     public Users getUserById(long id) throws UserNotFoundException {
         Optional<Users> users = usersRepository.findById(id);
         Users result = null;
@@ -46,11 +49,13 @@ public class UsersDAOImpl implements IUsersDAO{
     }
 
     @Override
+    @Transactional
     public List<Users> getAllUsers() {
         return usersRepository.findAll();
     }
 
     @Override
+    @Transactional
     public Users getUserByEmail(String email) throws UserNotFoundException {
         Optional<Users> users = usersRepository.findByEmail(email);
         Users result = null;
@@ -63,6 +68,7 @@ public class UsersDAOImpl implements IUsersDAO{
     }
 
     @Override
+    @Transactional
     public Users getUserByUsername(String username) throws UserNotFoundException {
         Optional<Users> users = usersRepository.findByUsername(username);
         Users result = null;
@@ -75,11 +81,13 @@ public class UsersDAOImpl implements IUsersDAO{
     }
 
     @Override
+    @Transactional
     public List<Users> getUsersByFullName(String fullName) {
-        return usersRepository.findByFullNameLike(fullName);
+        return usersRepository.findByFullNameLike("%"+fullName+"%");
     }
 
     @Override
+    @Transactional
     public Users updateUser(Users user) throws UserNotFoundException {
         Optional<Users> existingUserWithId = usersRepository.findById(user.getId());
         if(existingUserWithId.isEmpty()){
@@ -102,6 +110,7 @@ public class UsersDAOImpl implements IUsersDAO{
     }
 
     @Override
+    @Transactional
     public Users updateUserPasswordHash(Users user) throws UserNotFoundException {
         Users existingUser = this.getUserByUsername(user.getUsername());
         existingUser.setPasswordHash(user.getPasswordHash());
@@ -109,9 +118,21 @@ public class UsersDAOImpl implements IUsersDAO{
     }
 
     @Override
+    @Transactional
     public Users deleteUserById(long id) throws UserNotFoundException {
-        Users existingUser = this.getUserById(id);
-        usersRepository.delete(existingUser);
-        return existingUser;
+        Optional<Users> existingUser = usersRepository.findById(id);
+        if(existingUser.isEmpty()){
+            throw new UserNotFoundException("U001", "User with id: "+id+" does not exist");
+        }
+        try {
+            Users userToDelete = existingUser.get();
+            // Eagerly initialize the roles collection before deletion
+            userToDelete.getRoles().size();
+            usersRepository.delete(userToDelete);
+            return userToDelete;
+        }catch(Exception e){
+            System.out.println(e);
+            throw new UserNotFoundException("U004", "Failed to delete user with id: "+id);
+        }
     }
 }

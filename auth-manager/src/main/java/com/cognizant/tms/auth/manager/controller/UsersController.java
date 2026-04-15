@@ -27,35 +27,35 @@ public class UsersController {
     public ResponseEntity<List<UsersDTO>> getAllUsers(){
         List<Users> usersList = usersService.getAllUsers();
         List<UsersDTO> usersDTOS = usersList.stream().map(u-> userMapper.mapToUsersDTO(u)).toList();
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(usersDTOS);
+        return ResponseEntity.status(HttpStatus.OK).body(usersDTOS);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UsersDTO> getById(@PathVariable long id){
         Users users = usersService.getUserById(id);
         UsersDTO usersDTO = userMapper.mapToUsersDTO(users);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(usersDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(usersDTO);
     }
 
     @GetMapping("/username")
     public ResponseEntity<UsersDTO> getByUsername(@RequestParam("key") String username){
         Users users = usersService.getUserByUsername(username);
         UsersDTO usersDTO = userMapper.mapToUsersDTO(users);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(usersDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(usersDTO);
     }
 
     @GetMapping("/email")
     public ResponseEntity<UsersDTO> getByEmail(@RequestParam("key") String email){
         Users users = usersService.getUserByEmail(email);
         UsersDTO usersDTO = userMapper.mapToUsersDTO(users);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(usersDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(usersDTO);
     }
 
     @GetMapping("/name")
     public ResponseEntity<List<UsersDTO>> getAllUsers(@RequestParam("key") String fullname){
         List<Users> usersList = usersService.getUsersByFullName(fullname);
         List<UsersDTO> usersDTOS = usersList.stream().map(u-> userMapper.mapToUsersDTO(u)).toList();
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(usersDTOS);
+        return ResponseEntity.status(HttpStatus.OK).body(usersDTOS);
     }
 
     @PutMapping("/update")
@@ -63,6 +63,7 @@ public class UsersController {
         Users users = userMapper.mapToUsers(usersDTO);
         Users updatedUser = usersService.updateUser(users);
         UsersDTO updatedUserDTO = userMapper.mapToUsersDTO(updatedUser);
+        System.out.println(updatedUserDTO);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedUserDTO);
     }
 
@@ -70,6 +71,6 @@ public class UsersController {
     public ResponseEntity<UsersDTO> deleteUser(@PathVariable long id){
         Users users = usersService.deleteUserById(id);
         UsersDTO usersDTO = userMapper.mapToUsersDTO(users);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(usersDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(usersDTO);
     }
 }

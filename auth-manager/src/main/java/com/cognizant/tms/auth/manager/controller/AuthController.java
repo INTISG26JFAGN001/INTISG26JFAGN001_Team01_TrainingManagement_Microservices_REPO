@@ -15,6 +15,7 @@ import com.cognizant.tms.auth.manager.service.IUsersService;
 import com.cognizant.tms.auth.manager.util.AuthUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
+    @Transactional
     public ResponseEntity<SignupResponseDTO> signup(@Valid @RequestBody SignupRequestDTO requestDTO) throws Exception{
         SignupResponseDTO responseDTO = new SignupResponseDTO();
         responseDTO.setTimestamp(LocalDateTime.now());
@@ -101,6 +103,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Transactional
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO requestDTO, HttpServletResponse response) throws Exception{
         LoginResponseDTO responseDTO = new LoginResponseDTO();
         responseDTO.setTimestamp(LocalDateTime.now());
@@ -151,12 +154,21 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
+    @Transactional
     public ResponseEntity<LoginResponseDTO> refresh(HttpServletRequest request){
-        String refreshToken = Arrays.stream(request.getCookies())
-                .filter(c->c.getName().equals("refreshToken"))
-                .findFirst()
-                .map(c->c.getValue())
-                .orElse(null);
+        String refreshToken=null;
+        try {
+            refreshToken = Arrays.stream(request.getCookies())
+                    .filter(c -> c.getName().equals("refreshToken"))
+                    .findFirst()
+                    .map(c -> c.getValue())
+                    .orElse(null);
+        }catch(NullPointerException ne){
+            throw new TokenInvalidException("No token present");
+        }
+        catch(Exception e){
+            throw new TokenInvalidException(e.getMessage());
+        }
         LoginResponseDTO responseDTO = new LoginResponseDTO();
         responseDTO.setTimestamp(LocalDateTime.now());
         boolean success = false;
@@ -179,6 +191,7 @@ public class AuthController {
                 throw new TokenInvalidException("Token is not Valid");
             }
         }else{
+            System.out.println("No token present"+refreshToken);
             throw new TokenInvalidException("No token present");
         }
         responseDTO.setLoginSuccess(success);
