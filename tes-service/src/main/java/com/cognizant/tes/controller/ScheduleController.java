@@ -26,7 +26,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/{scheduleId}")
-    public ScheduleDTO getScheduleById(@PathVariable("id") Long scheduleId) {
+    public ScheduleDTO getScheduleById(@PathVariable("scheduleId") Long scheduleId) {
         Schedule schedule = scheduleService.getScheduleById(scheduleId);
         return ScheduleMapper.toDTO(schedule);
     }
@@ -38,7 +38,7 @@ public class ScheduleController {
     }
 
     @PutMapping("/{scheduleId}/session-date")
-    public ScheduleDTO updateSessionDate(@PathVariable("id") Long scheduleId,
+    public ScheduleDTO updateSessionDate(@PathVariable("scheduleId") Long scheduleId,
                                          @RequestParam LocalDateTime sessionDate) {
         Schedule schedule = scheduleService.updateSessionDate(scheduleId, sessionDate);
         return ScheduleMapper.toDTO(schedule);
