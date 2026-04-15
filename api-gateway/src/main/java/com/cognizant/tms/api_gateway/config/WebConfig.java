@@ -26,6 +26,12 @@ public class WebConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
         httpSecurity.authorizeHttpRequests(auth->{
             auth.requestMatchers("/auth/**").permitAll();
+            auth.requestMatchers(
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/v3/api-docs/**",
+                    "/webjars/**"
+            ).permitAll();
             auth.requestMatchers("/user/all").hasRole("ADMIN");
             auth.anyRequest().permitAll();
         });
