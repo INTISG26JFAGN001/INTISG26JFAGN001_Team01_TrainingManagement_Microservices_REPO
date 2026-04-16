@@ -24,7 +24,7 @@ public class Users {
     @Column(name="password_hash", nullable = false)
     private String passwordHash;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="users_roles",
             joinColumns = @JoinColumn(name="users_id"),
