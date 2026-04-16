@@ -1,9 +1,6 @@
 package com.cognizant.tms.auth.manager.controller;
 
-import com.cognizant.tms.auth.manager.dto.LoginRequestDTO;
-import com.cognizant.tms.auth.manager.dto.LoginResponseDTO;
-import com.cognizant.tms.auth.manager.dto.SignupRequestDTO;
-import com.cognizant.tms.auth.manager.dto.SignupResponseDTO;
+import com.cognizant.tms.auth.manager.dto.*;
 import com.cognizant.tms.auth.manager.exception.RoleNotFoundException;
 import com.cognizant.tms.auth.manager.exception.TokenInvalidException;
 import com.cognizant.tms.auth.manager.exception.UserNotFoundException;
@@ -13,6 +10,13 @@ import com.cognizant.tms.auth.manager.service.CustomUserDetailsService;
 import com.cognizant.tms.auth.manager.service.IRolesService;
 import com.cognizant.tms.auth.manager.service.IUsersService;
 import com.cognizant.tms.auth.manager.util.AuthUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -23,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,6 +44,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name="Authentication Controller", description="This controller handles all operations related to user " +
+        "authentication, user creation and token management. It provides endpoints for user registration, login," +
+        " and token refresh. The controller interacts with the user and role services to manage user data and " +
+        "roles, and utilizes JWT for secure authentication and authorization.")
 public class AuthController {
 
     private final IUsersService usersService;
@@ -59,6 +68,76 @@ public class AuthController {
         this.userDetailsService = userDetailsService;
     }
 
+
+    /*
+        This is my Signup Endpoint.
+    */
+    @Operation(summary = "Sign Up User Endpoint (ADMIN ONLY)",
+    description="This endpoint allows for the registration of new users. It accepts a JSON payload containing the " +
+            "user's username, email, full name, password, and roles. The password is securely hashed before being"+
+            "stored. Only users with the ADMIN role can access this endpoint to create new users. The endpoint"+
+            " also checks if the specified username, email are already existing in the database or not and whether " +
+            "the specified roles are valid or not. If the registration is successful, it returns a success message " )
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "201",
+                    content=@Content(mediaType="application/json",
+                        schema=@Schema(implementation= SignupResponseDTO.class),
+                        examples={
+                        @ExampleObject(
+                                name="Successful Sign Up",
+                                value="{\n" +
+                                        "  \"timestamp\": \"2024-06-01T12:00:00\",\n" +
+                                        "  \"signUpSuccess\": true,\n" +
+                                        "  \"message\": \"Sign up successful. Username: newuser\"\n" +
+                                        "}"
+                        )
+                        }
+                    )
+            ),
+            @ApiResponse(responseCode="403",
+                    content=@Content(mediaType="application/json",
+                        schema=@Schema(implementation=SignupResponseDTO.class),
+                        examples={
+                            @ExampleObject(
+                                    name="Unauthorized",
+                                    value=""
+                            )
+                        }
+                    )
+            ),
+            @ApiResponse(responseCode="404",
+                    content=@Content(mediaType="application/json",
+                        schema=@Schema(implementation=SignupResponseDTO.class),
+                            examples={
+                                    @ExampleObject(
+                                            name="Username already Exists",
+                                            value="{\n" +
+                                                    "    \"timestamp\": \"2026-04-16T14:00:21.0563989\",\n" +
+                                                    "    \"message\": \"User with username: associate1 already exists\",\n" +
+                                                    "    \"errorCode\": \"U002\",\n" +
+                                                    "    \"path\": \"/auth/signup\"\n" +
+                                                    "}"
+                                    ), @ExampleObject(
+                                        name="Email Already Exists",
+                                        value="{\n" +
+                                                "    \"timestamp\": \"2026-04-16T14:03:29.6134144\",\n" +
+                                                "    \"message\": \"User with email: associate1@example.com already exists\",\n" +
+                                                "    \"errorCode\": \"U003\",\n" +
+                                                "    \"path\": \"/auth/signup\"\n" +
+                                                "}"
+                                    ), @ExampleObject(
+                                                name="Role Does not Exist",
+                                                value="{\n" +
+                                                        "    \"timestamp\": \"2026-04-16T14:05:59.9112564\",\n" +
+                                                        "    \"message\": \"Role ROLE_TEST not found\",\n" +
+                                                        "    \"errorCode\": \"R001\",\n" +
+                                                        "    \"path\": \"/auth/signup\"\n" +
+                                                        "}"
+                                    )
+                            }
+                    )
+            )
+    })
     @PostMapping("/signup")
     @Transactional
     public ResponseEntity<SignupResponseDTO> signup(@Valid @RequestBody SignupRequestDTO requestDTO) throws Exception{
@@ -102,6 +181,59 @@ public class AuthController {
         return ResponseEntity.status(status).body(responseDTO);
     }
 
+
+    /*
+        This is my Login Endpoint.
+    */
+    @Operation(summary="Login User Endpoint (ALL USERS)", description="This endpoint allows users to log in by " +
+            "providing their username and password. It accepts a JSON payload containing the username and password. " +
+            "If the credentials are valid, it generates a JWT access token and a refresh token. The access token is " +
+            "returned in the response body, while the refresh token is set as an HTTP-only cookie. The endpoint also" +
+            " handles various error scenarios such as invalid credentials, user not found, and token generation " +
+            "issues.")
+    @ApiResponses(value={
+            @ApiResponse(responseCode="200",
+                    content=@Content(mediaType="application/json",
+                            schema=@Schema(implementation= LoginResponseDTO.class),
+                            examples={
+                            @ExampleObject(
+                                    name="Login Successful",
+                                    value="{\n" +
+                                            "    \"timestamp\": \"2026-04-16T14:42:23.8024162\",\n" +
+                                            "    \"message\": \"Welcome Associate CTS\",\n" +
+                                            "    \"loginSuccess\": true,\n" +
+                                            "    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJjbGFpbXMiOlsiUk9MRV9BU1NPQ0lBVEUiXSwic3ViIjoiYXNzb2NpYXRlMSIsImlhdCI6MTc3NjMzMDc0NCwiZXhwIjoxNzc2NDE3MTQ0fQ.Pj2BVSpc4Xtt3FB7tLZ3nIiKhVJjbtCbB4SAwlJALAo\"\n" +
+                                            "}"
+                            )
+
+                            }
+                    )
+            ),
+            @ApiResponse(responseCode="404",
+                    content=@Content(mediaType="application/json",
+                            schema=@Schema(implementation= ErrorResponseDTO.class),
+                            examples={
+                            @ExampleObject(
+                                    name="Username Invalid",
+                                    value="{\n" +
+                                            "    \"timestamp\": \"2026-04-16T14:44:24.9926052\",\n" +
+                                            "    \"message\": \"User with username: associate10 does not exist\",\n" +
+                                            "    \"errorCode\": \"U002\",\n" +
+                                            "    \"path\": \"/auth/login\"\n" +
+                                            "}"
+                            ), @ExampleObject(
+                                    name="Password Invalid",
+                                    value="{\n" +
+                                            "    \"timestamp\": \"2026-04-16T14:48:58.680244\",\n" +
+                                            "    \"message\": \"Invalid password\",\n" +
+                                            "    \"errorCode\": \"U004\",\n" +
+                                            "    \"path\": \"/auth/login\"\n" +
+                                            "}"
+                            )
+                            }
+                    )
+            )
+    })
     @PostMapping("/login")
     @Transactional
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO requestDTO, HttpServletResponse response) throws Exception{
@@ -143,6 +275,9 @@ public class AuthController {
         catch(TokenInvalidException te){
             throw te;
         }
+        catch(BadCredentialsException be){
+            throw be;
+        }
         catch(Exception e){
             System.out.println(e);
             throw new Exception("Login Failed");
@@ -153,6 +288,10 @@ public class AuthController {
         return ResponseEntity.status(status).body(responseDTO);
     }
 
+
+    /*
+        This is my Refresh Token Endpoint.
+    */
     @PostMapping("/refresh-token")
     @Transactional
     public ResponseEntity<LoginResponseDTO> refresh(HttpServletRequest request){
