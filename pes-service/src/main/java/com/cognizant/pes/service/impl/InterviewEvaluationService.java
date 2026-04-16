@@ -10,7 +10,7 @@ import com.cognizant.pes.dto.response.InterviewEvaluationResponseDTO.RubricScore
 import com.cognizant.pes.dto.response.RubricResponseDTO;
 import com.cognizant.pes.exception.ResourceNotFoundException;
 import com.cognizant.pes.service.IInterviewEvaluationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;   // ✅ Lombok logger
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,24 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Service responsible for managing interview evaluations in PES.
- *
- * How it works:
- * 1. When an evaluation is submitted, PES calls ASM via Feign (AsmRubricClient)
- *    to validate the rubrics and fetch their weights.
- * 2. PES stores the evaluation with per-rubric scores.
- * 3. When ASM asks for results, PES returns the full evaluation with rubric breakdown.
- *
- * Why in PES? Interview evaluation is a "human review" process. The tech lead or
- * scrum lead assesses the associate's technical and behavioral performance.
- * This is the same domain as project reviews — both are evaluation activities.
- */
 @Service
+@Slf4j
 public class InterviewEvaluationService implements IInterviewEvaluationService {
 
     private final IInterviewEvaluationDAO evaluationDAO;
-
     private final AsmRubricClient asmRubricClient;
 
     public InterviewEvaluationService(IInterviewEvaluationDAO evaluationDAO,
@@ -48,22 +35,24 @@ public class InterviewEvaluationService implements IInterviewEvaluationService {
 
     @Override
     @Transactional
-    public InterviewEvaluationResponseDTO submitEvaluation(InterviewEvaluationRequestDTO request) throws ResourceNotFoundException{
+    public InterviewEvaluationResponseDTO submitEvaluation(InterviewEvaluationRequestDTO request) throws ResourceNotFoundException {
+        log.info("Submitting interview evaluation for assessmentId={} and associateId={}",
+                request.assessmentId(), request.associateId());
 
         // Step 1: Check for duplicate evaluation
         if (evaluationDAO.existsByAssessmentIdAndAssociateId(request.assessmentId(), request.associateId())) {
-            throw new IllegalStateException(
-                    "An evaluation already exists for assessmentId=" + request.assessmentId() +
-                            " and associateId=" + request.associateId() +
-                            ". Use update instead.");
+            log.warn("Duplicate evaluation detected for assessmentId={} and associateId={}",
+                    request.assessmentId(), request.associateId());
+            throw new IllegalStateException("Evaluation already exists. Use update instead.");
         }
 
-        // Step 2: Fetch rubrics from ASM to validate submitted scores
+        // Step 2: Fetch rubrics from ASM
+        log.debug("Fetching rubrics from ASM for assessmentId={}", request.assessmentId());
         List<RubricResponseDTO> rubrics = asmRubricClient.getRubricsForInterview(request.assessmentId());
         Map<Long, RubricResponseDTO> rubricMap = rubrics.stream()
                 .collect(Collectors.toMap(RubricResponseDTO::id, r -> r));
 
-        // Step 3: Build rubric score entities
+        // Step 3: Build rubric scores
         int totalScore = 0;
         int maxScore = 0;
         List<InterviewRubricScore> rubricScores = new ArrayList<>();
@@ -71,15 +60,15 @@ public class InterviewEvaluationService implements IInterviewEvaluationService {
         for (InterviewEvaluationRequestDTO.RubricScoreDTO scoreDTO : request.rubricScores()) {
             RubricResponseDTO rubric = rubricMap.get(scoreDTO.rubricId());
             if (rubric == null) {
-                throw new ResourceNotFoundException(
-                        "Rubric with ID " + scoreDTO.rubricId() + " not found in ASM for interview " + request.assessmentId());
+                log.error("Rubric with ID {} not found in ASM for assessmentId={}",
+                        scoreDTO.rubricId(), request.assessmentId());
+                throw new ResourceNotFoundException("Rubric not found");
             }
 
-            // Validate: score awarded cannot exceed rubric weight
             if (scoreDTO.scoreAwarded() > rubric.weight()) {
-                throw new IllegalArgumentException(
-                        "Score " + scoreDTO.scoreAwarded() + " for rubric '" + rubric.criteria() +
-                                "' exceeds maximum allowed weight of " + rubric.weight());
+                log.error("Invalid score {} for rubric '{}' exceeds weight {}",
+                        scoreDTO.scoreAwarded(), rubric.criteria(), rubric.weight());
+                throw new IllegalArgumentException("Score exceeds rubric weight");
             }
 
             totalScore += scoreDTO.scoreAwarded();
@@ -94,13 +83,15 @@ public class InterviewEvaluationService implements IInterviewEvaluationService {
                     .build();
 
             rubricScores.add(rubricScore);
+            log.debug("Added rubric score for rubricId={} with awarded={}", rubric.id(), scoreDTO.scoreAwarded());
         }
 
         // Step 4: Determine pass/fail
-        // Pass if aggregate score >= 60% of max
         String resultStatus = (maxScore > 0 && totalScore * 100 / maxScore >= 60) ? "PASS" : "FAIL";
+        log.info("Evaluation result for assessmentId={} and associateId={} is {} (totalScore={}, maxScore={})",
+                request.assessmentId(), request.associateId(), resultStatus, totalScore, maxScore);
 
-        // Step 5: Build and save the evaluation
+        // Step 5: Build and save evaluation
         InterviewEvaluation evaluation = InterviewEvaluation.builder()
                 .assessmentId(request.assessmentId())
                 .associateId(request.associateId())
@@ -114,27 +105,31 @@ public class InterviewEvaluationService implements IInterviewEvaluationService {
                 .rubricScores(rubricScores)
                 .build();
 
-        // Link rubric scores back to the evaluation
         rubricScores.forEach(rs -> rs.setInterviewEvaluation(evaluation));
 
         InterviewEvaluation saved = evaluationDAO.save(evaluation);
+        log.info("Interview evaluation saved successfully with id={}", saved.getId());
+
         return toResponseDTO(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     public InterviewEvaluationResponseDTO getEvaluationByAssessmentAndAssociate(Long assessmentId, Long associateId) throws ResourceNotFoundException {
+        log.info("Fetching evaluation for assessmentId={} and associateId={}", assessmentId, associateId);
         InterviewEvaluation evaluation = evaluationDAO
                 .findByAssessmentIdAndAssociateId(assessmentId, associateId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "No interview evaluation found for assessmentId=" + assessmentId +
-                                " and associateId=" + associateId));
+                .orElseThrow(() -> {
+                    log.warn("No evaluation found for assessmentId={} and associateId={}", assessmentId, associateId);
+                    return new ResourceNotFoundException("No interview evaluation found");
+                });
         return toResponseDTO(evaluation);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<InterviewEvaluationResponseDTO> getAllEvaluationsByAssessment(Long assessmentId) {
+        log.info("Fetching all evaluations for assessmentId={}", assessmentId);
         return evaluationDAO.findByAssessmentId(assessmentId).stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
@@ -143,12 +138,11 @@ public class InterviewEvaluationService implements IInterviewEvaluationService {
     @Override
     @Transactional(readOnly = true)
     public List<InterviewEvaluationResponseDTO> getAllEvaluationsByAssociate(Long associateId) {
+        log.info("Fetching all evaluations for associateId={}", associateId);
         return evaluationDAO.findByAssociateId(associateId).stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
-
-    // ─── Mapper ────────────────────────────────────────────────────────────────
 
     private InterviewEvaluationResponseDTO toResponseDTO(InterviewEvaluation eval) {
         List<RubricScoreResponseDTO> rubricDTOs = eval.getRubricScores().stream()
