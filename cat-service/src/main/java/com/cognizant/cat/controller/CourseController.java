@@ -1,6 +1,5 @@
 package com.cognizant.cat.controller;
 
-import com.cognizant.cat.dto.ApiResponse;
 import com.cognizant.cat.dto.CourseRequestDTO;
 import com.cognizant.cat.dto.CourseResponseDTO;
 import com.cognizant.cat.service.ICourseService;

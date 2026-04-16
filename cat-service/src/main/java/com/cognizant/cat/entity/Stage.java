@@ -20,3 +20,5 @@ public class Stage {
     @JoinColumn(name= "course_id")
     private Course course;
 }
+
+//course description
