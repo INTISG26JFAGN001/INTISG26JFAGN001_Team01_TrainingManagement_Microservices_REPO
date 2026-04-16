@@ -292,6 +292,54 @@ public class AuthController {
     /*
         This is my Refresh Token Endpoint.
     */
+    @Operation(summary="Refresh Token Endpoint (ALL USERS)", description="This endpoint allows users to refresh" +
+            " their JWT access token using a valid refresh token. The refresh token is expected to be sent as an " +
+            "HTTP-only cookie named refreshToken. If the refresh token is valid, a new access token is generated " +
+            "and returned in the response body. The endpoint also handles various error scenarios such as missing " +
+            "or invalid refresh tokens.")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "202",
+                    content=@Content(mediaType="application/json",
+                            schema=@Schema(implementation= LoginResponseDTO.class),
+                            examples={
+                            @ExampleObject(
+                                    name="Token Refresh Successful",
+                                    value="{\n" +
+                                            "    \"timestamp\": \"2026-04-16T14:57:22.5266765\",\n" +
+                                            "    \"message\": \"Access Permitted\",\n" +
+                                            "    \"loginSuccess\": true,\n" +
+                                            "    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJjbGFpbXMiOlsiUk9MRV9BU1NPQ0lBVEUiXSwic3ViIjoiYXNzb2NpYXRlMSIsImlhdCI6MTc3NjMzMTY0MiwiZXhwIjoxNzc2NDE4MDQyfQ.V4pwjxxQOPQD5c_zNMnc2CW053i3DfrDdEJXAL963n8\"\n" +
+                                            "}"
+                            )
+
+                            }
+                    )
+            ),
+            @ApiResponse(responseCode="404",
+                    content=@Content(mediaType="application/json",
+                            schema=@Schema(implementation= ErrorResponseDTO.class),
+                            examples={
+                            @ExampleObject(
+                                    name="No Token Present",
+                                    value="{\n" +
+                                            "    \"timestamp\": \"2026-04-16T14:59:24.9926052\",\n" +
+                                            "    \"message\": \"No token present\",\n" +
+                                            "    \"errorCode\": \"T001\",\n" +
+                                            "    \"path\": \"/auth/refresh-token\"\n" +
+                                            "}"
+                            ), @ExampleObject(
+                                    name="Token Invalid",
+                                    value="{\n" +
+                                            "    \"timestamp\": \"2026-04-16T15:01:58.680244\",\n" +
+                                            "    \"message\": \"Token is not Valid\",\n" +
+                                            "    \"errorCode\": \"T001\",\n" +
+                                            "    \"path\": \"/auth/refresh-token\"\n" +
+                                            "}"
+                            )
+                            }
+                    )
+            )
+    })
     @PostMapping("/refresh-token")
     @Transactional
     public ResponseEntity<LoginResponseDTO> refresh(HttpServletRequest request){
