@@ -25,7 +25,7 @@ public class EvaluationDAOImpl implements IEvaluationDAO {
     }
 
     @Override
-    public void save(Evaluation eval) {
-        evaluationRepository.save(eval);
+    public Evaluation save(Evaluation eval) {
+        return evaluationRepository.save(eval);
     }
 }

@@ -1,9 +1,6 @@
 package com.cognizant.pes.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Builder
@@ -15,6 +12,8 @@ import lombok.*;
 @Table(name="evaluation")
 public class Evaluation {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(name="batch_id")

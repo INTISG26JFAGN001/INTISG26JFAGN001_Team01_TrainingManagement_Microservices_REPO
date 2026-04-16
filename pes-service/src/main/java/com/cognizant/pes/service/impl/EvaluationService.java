@@ -2,6 +2,7 @@ package com.cognizant.pes.service.impl;
 
 import com.cognizant.pes.dao.impl.EvaluationDAOImpl;
 import com.cognizant.pes.domain.Evaluation;
+import com.cognizant.pes.dto.request.EvaluationRequestDTO;
 import com.cognizant.pes.dto.response.EvaluationResponseDTO;
 import com.cognizant.pes.mapper.EvaluationMapper;
 import com.cognizant.pes.service.IEvaluationService;
@@ -52,5 +53,12 @@ public class EvaluationService implements IEvaluationService {
 
 
         }
+    }
+
+    @Override
+    public EvaluationResponseDTO submitEvaluation(EvaluationRequestDTO request) {
+        Evaluation evaluation = evaluationMapper.toDomain(request);
+        Evaluation savedEvaluation = evaluationDAO.save(evaluation);
+        return evaluationMapper.toDto(savedEvaluation);
     }
 }
