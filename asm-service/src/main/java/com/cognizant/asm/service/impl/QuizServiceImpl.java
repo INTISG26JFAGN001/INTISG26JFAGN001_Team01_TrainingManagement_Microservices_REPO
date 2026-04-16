@@ -18,6 +18,11 @@ import com.cognizant.asm.exception.AssessmentNotFoundException;
 import com.cognizant.asm.exception.AttemptNotFoundException;
 import com.cognizant.asm.exception.AssessmentNotAvailableException;
 import com.cognizant.asm.exception.DuplicateAttemptException;
+import com.cognizant.asm.exception.UserNotFoundException;
+import com.cognizant.asm.exception.BatchNotFoundException;
+
+import com.cognizant.asm.integration.TesUserClient;
+import com.cognizant.asm.integration.TesBatchClient;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,16 +38,22 @@ public class QuizServiceImpl implements QuizService {
     private final QuizDAO quizDAO;
     private final QuizAttemptDAO quizAttemptDAO;
     private final QuizMapper quizMapper;
+    private final TesUserClient tesUserClient;
+    private final TesBatchClient tesBatchClient;
 
-    public QuizServiceImpl(QuizDAO quizDAO, QuizAttemptDAO quizAttemptDAO, QuizMapper quizMapper) {
+    public QuizServiceImpl(QuizDAO quizDAO, QuizAttemptDAO quizAttemptDAO, QuizMapper quizMapper, TesUserClient tesUserClient, TesBatchClient tesBatchClient) {
         this.quizDAO = quizDAO;
         this.quizAttemptDAO = quizAttemptDAO;
         this.quizMapper = quizMapper;
+        this.tesUserClient = tesUserClient;
+        this.tesBatchClient = tesBatchClient;
     }
 
     @Override
     @Transactional
     public QuizDetailResponse createQuiz(CreateQuizRequest request, Long createdBy) {
+        validateBatchId(request.getBatchId());
+        validateTrainer(createdBy);
         Quiz quiz = quizMapper.toEntity(request);
         quiz.setCreatedBy(createdBy);
         List<QuizQuestion> questions = new ArrayList<>();
@@ -93,6 +104,7 @@ public class QuizServiceImpl implements QuizService {
     @Transactional
     public QuizAttemptResultResponse attemptQuiz(Long quizId, QuizAttemptRequest request) {
         Quiz quiz = findQuizOrThrow(quizId);
+        validateAssociate(request.getAssociateId());
 
         if(quiz.getStatus() != AssessmentStatus.PUBLISHED) {
             throw new AssessmentNotAvailableException(quizId);
@@ -166,5 +178,32 @@ public class QuizServiceImpl implements QuizService {
     private Quiz findQuizOrThrow(Long quizId) {
         return quizDAO.findById(quizId)
                 .orElseThrow(() -> new AssessmentNotFoundException("Quiz not found with ID: " + quizId));
+    }
+
+    private void validateBatchId(Long batchId) {
+        if (batchId == null) return;
+        try {
+            tesBatchClient.getBatchById(batchId);
+        } catch (Exception ex) {
+            throw new BatchNotFoundException(batchId);
+        }
+    }
+
+    private void validateTrainer(Long trainerId) {
+        if (trainerId == null) return;
+        try {
+            tesUserClient.getTrainerById(trainerId);
+        } catch (Exception ex) {
+            throw new UserNotFoundException("Trainer", trainerId);
+        }
+    }
+
+    private void validateAssociate(Long associateId) {
+        if (associateId == null) return;
+        try {
+            tesUserClient.getAssociateByUserId(associateId);
+        } catch (Exception ex) {
+            throw new UserNotFoundException("Associate", associateId);
+        }
     }
 }
