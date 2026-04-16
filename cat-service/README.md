@@ -13,51 +13,51 @@ Base URL - http://localhost:8081
 
 ### Technology APIs
 1. Create technology 
-   POST /api/technologies
+   POST /technologies
    Access: ADMIN, TECH_LEAD
 2. Get all technologies
-   GET /api/technologies
+   GET /technologies
    Access: ALL ROLES
 3. Get technology by ID
-   GET /api/technologies/{id}
+   GET /technologies/{id}
    Access: ALL ROLES
 4. Update technology
-   PUT /api/technologies/{id}
+   PUT /technologies/{id}
    Access: ADMIN, TRAINER, TECH_LEAD 
 5. Delete technology
-   DELETE /api/technologies
+   DELETE /technologies
    Access: ADMIN, TECH_LEAD 
 
 ### Course APIs
 1. Create Course
-   POST /api/courses
+   POST /courses
    Access: ADMIN, TECH_LEAD 
 2. Get all courses
-   GET /api/courses
+   GET /courses
    Access: ALL ROLES
 3. Get course by ID
-   GET /api/courses/{id}
+   GET /courses/{id}
    Access: ALL ROLES
 4. Update course
-   PUT /api/courses/{id}
+   PUT /courses/{id}
    Access: ADMIN, TECH_LEAD, TRAINER
 5. Delete course
-   DELETE /api/courses
+   DELETE /courses
    Access: ADMIN, TECH_LEAD
 
 ### Stage APIs
 1. Create stage
-   POST /api/stages
+   POST /stages
    Access: ADMIN, TECH_LEAD
 2. Get all stages
-   GET /api/stages
+   GET /stages
    Access: ALL ROLES
 3. Get stage by ID
-   GET /api/stages/{id}
+   GET /stages/{id}
    Access: ALL ROLES
 4. Update stage
-   PUT /api/stages/{id}
+   PUT /stages/{id}
    Access: ADMIN, TECH_LEAD, TRAINER
 5. Delete stage
-   DELETE /api/stages
+   DELETE /stages
    Access: ADMIN, TECH_LEAD
