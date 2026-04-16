@@ -23,7 +23,7 @@
 | DELETE | ``/batches/{id}`` | Delete batch by ID | ADMIN |
 | PUT | ``/batches/{id}/status?status={BatchStatus}`` | Update batch status | ADMIN, TRAINER |
 | GET | ``/batches/status?status={BatchStatus}`` | Get batches by status | ADMIN, TRAINER, TECH_LEAD, COACH |
-| GET | ``/batches/course?course_id={courseId}`` | Get batches by course ID | ADMIN, TRAINER, TECH_LEAD, COACH |
+| GET | ``/batches/course?course_id={batchId}`` | Get batches by course ID | ADMIN, TRAINER, TECH_LEAD, COACH |
 | GET | ``/batches/trainer?trainer_id={trainerId}`` | Get batches by trainer ID | ADMIN, TRAINER, TECH_LEAD, COACH |
 | GET | ``/batches/{id}/details`` | Get detailed batch info | ADMIN, TRAINER |
 | GET | ``/batches/{batchId}/courses`` | Get courses for a batch | ADMIN, TRAINER, TECH_LEAD, COACH, ASSOCIATE |

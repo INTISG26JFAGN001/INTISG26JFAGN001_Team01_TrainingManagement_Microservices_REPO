@@ -1,18 +1,16 @@
 package com.cognizant.tes.dto;
 
-import jakarta.validation.constraints.NotBlank;
-
 public class CreateAssociateDTO {
     private long userId;
-    private long courseId;
+    private long batchid;
     private int xp;
 
     public CreateAssociateDTO() {
     }
 
-    public CreateAssociateDTO(long userId, long courseId, int xp) {
+    public CreateAssociateDTO(long userId, long batchid, int xp) {
         this.userId = userId;
-        this.courseId = courseId;
+        this.batchid = batchid;
         this.xp = xp;
     }
 
@@ -25,12 +23,12 @@ public class CreateAssociateDTO {
         this.userId = userId;
     }
 
-    public long getCourseId() {
-        return courseId;
+    public long getBatchid() {
+        return batchid;
     }
 
-    public void setCourseId(long courseId) {
-        this.courseId = courseId;
+    public void setBatchid(long batchid) {
+        this.batchid = batchid;
     }
 
     public int getXp() {
@@ -45,7 +43,7 @@ public class CreateAssociateDTO {
     public String toString() {
         return "AssociateDTO{" +
                 ", userId=" + userId +
-                ", courseId=" + courseId +
+                ", batchid=" + batchid +
                 ", xp=" + xp +
                 '}';
     }

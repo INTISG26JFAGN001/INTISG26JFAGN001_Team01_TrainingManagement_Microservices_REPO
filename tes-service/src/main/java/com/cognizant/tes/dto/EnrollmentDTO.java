@@ -1,9 +1,11 @@
 package com.cognizant.tes.dto;
 
 import com.cognizant.tes.entity.EnrollmentStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDate;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EnrollmentDTO {
     private Long enrollmentId;
     private Long batchId;

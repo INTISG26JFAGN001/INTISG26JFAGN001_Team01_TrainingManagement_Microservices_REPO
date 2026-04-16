@@ -12,7 +12,7 @@ public class AssociateMapper {
         AssociateDTO dto = new AssociateDTO();
         dto.setId(associate.getId());
         dto.setUserId(associate.getUserId());
-        dto.setCourseId(associate.getBatchId());
+        dto.setBatchId(associate.getBatchId());
         dto.setXp(associate.getXp());
         return dto;
     }
@@ -24,7 +24,7 @@ public class AssociateMapper {
         Associate associate = new Associate();
         associate.setId(dto.getId());
         associate.setUserId(dto.getUserId());
-        associate.setBatchId(dto.getCourseId());
+        associate.setBatchId(dto.getBatchId());
         associate.setXp(dto.getXp());
         return associate;
     }
@@ -34,7 +34,7 @@ public class AssociateMapper {
         }
         Associate associate = new Associate();
         associate.setUserId(dto.getUserId());
-        associate.setBatchId(dto.getCourseId());
+        associate.setBatchId(dto.getBatchid());
         associate.setXp(dto.getXp());
         return associate;
     }
