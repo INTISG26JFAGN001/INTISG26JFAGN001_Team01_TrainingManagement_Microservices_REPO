@@ -25,7 +25,7 @@ Base URL - http://localhost:8081
    PUT /technologies/{id}
    Access: ADMIN, TRAINER, TECH_LEAD 
 5. Delete technology
-   DELETE /technologies
+   DELETE /technologies/{id}
    Access: ADMIN, TECH_LEAD 
 
 ### Course APIs
@@ -42,7 +42,7 @@ Base URL - http://localhost:8081
    PUT /courses/{id}
    Access: ADMIN, TECH_LEAD, TRAINER
 5. Delete course
-   DELETE /courses
+   DELETE /courses/{id}
    Access: ADMIN, TECH_LEAD
 
 ### Stage APIs
@@ -59,5 +59,5 @@ Base URL - http://localhost:8081
    PUT /stages/{id}
    Access: ADMIN, TECH_LEAD, TRAINER
 5. Delete stage
-   DELETE /stages
+   DELETE /stages/{id}
    Access: ADMIN, TECH_LEAD
