@@ -4,6 +4,7 @@ import com.cognizant.tms.auth.manager.dto.ErrorResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -42,6 +43,17 @@ public class GlobalExceptionHandler {
         response.setMessage(ex.getMessage());
         response.setPath(request.getRequestURI());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleBadCredentialsException(BadCredentialsException ex,
+                                                                          HttpServletRequest request){
+        ErrorResponseDTO response = new ErrorResponseDTO();
+        response.setTimestamp(LocalDateTime.now());
+        response.setErrorCode("U004");
+        response.setMessage("Invalid password");
+        response.setPath(request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
     @ExceptionHandler(Exception.class)

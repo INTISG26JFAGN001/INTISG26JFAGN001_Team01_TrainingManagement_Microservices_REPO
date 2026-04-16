@@ -57,6 +57,10 @@ public class AdminSeeder {
         }
         Roles adminRole = rolesService.getByRoleName("ROLE_ADMIN");
         admin.setRoles(List.of(adminRole));
-        usersService.createUser(admin);
+        try {
+            usersService.createUser(admin);
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 }
