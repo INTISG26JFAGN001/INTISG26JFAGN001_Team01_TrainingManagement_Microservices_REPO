@@ -155,7 +155,7 @@ public class WebConfig {
                 auth.requestMatchers(HttpMethod.DELETE, "/assessments/{assessmentId}/rubrics/{rubricId}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD");
 
                 // Review Controller
-                auth.requestMatchers(HttpMethod.POST, "/reviews/project/{projectId}").hasAnyRole("SCRUM_LEAD","TECH_LEAD");
+                auth.requestMatchers(HttpMethod.POST, "/reviews/project/{projectId}").hasAnyRole("ADMIN","SCRUM_LEAD","TECH_LEAD");
                 auth.requestMatchers(HttpMethod.GET, "/reviews/project/{projectId}/all").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE","SCRUM_LEAD");
                 auth.requestMatchers(HttpMethod.GET, "/reviews/{reviewId}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","SCRUM_LEAD");
                 auth.requestMatchers(HttpMethod.PUT, "/reviews/{reviewId}").hasAnyRole("SCRUM_LEAD","TECH_LEAD");

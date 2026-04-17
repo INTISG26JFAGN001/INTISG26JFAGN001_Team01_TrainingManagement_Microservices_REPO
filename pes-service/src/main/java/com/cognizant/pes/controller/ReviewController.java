@@ -2,6 +2,7 @@ package com.cognizant.pes.controller;
 
 import com.cognizant.pes.dto.request.ReviewRequestDTO;
 import com.cognizant.pes.dto.response.ReviewResponseDTO;
+import com.cognizant.pes.exception.ResourceNotFoundException;
 import com.cognizant.pes.service.impl.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -78,7 +79,7 @@ public class ReviewController {
     @PostMapping("/project/{projectId}")
     public ResponseEntity<ReviewResponseDTO> submitReview(
             @PathVariable Long projectId,
-            @Valid @RequestBody ReviewRequestDTO request) {
+            @Valid @RequestBody ReviewRequestDTO request) throws ResourceNotFoundException {
 
         ReviewResponseDTO response =
                 reviewService.saveReview(projectId, request);
