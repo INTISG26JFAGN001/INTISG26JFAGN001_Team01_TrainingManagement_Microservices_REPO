@@ -10,6 +10,6 @@ public interface IEvaluationDAO {
 
     Evaluation findByBatchIdAndAssociateId(Long batchId, Long associateId);
 
-    void save(Evaluation eval);
+    Evaluation save(Evaluation eval);
 
 }

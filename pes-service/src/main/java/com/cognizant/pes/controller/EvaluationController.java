@@ -1,5 +1,6 @@
 package com.cognizant.pes.controller;
 
+import com.cognizant.pes.dto.request.EvaluationRequestDTO;
 import com.cognizant.pes.dto.response.EvaluationResponseDTO;
 import com.cognizant.pes.service.impl.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,12 @@ public class EvaluationController {
     @Autowired
     private EvaluationService evaluationService;
 
+    @PostMapping("/submitEvaluation")
+    public ResponseEntity<EvaluationResponseDTO> submitEvaluation(
+            @RequestBody EvaluationRequestDTO request) {
+        EvaluationResponseDTO response = evaluationService.submitEvaluation(request);
+        return ResponseEntity.ok(response);
+    }
     @GetMapping("/batch/{batchId}")
     public ResponseEntity<List<EvaluationResponseDTO>> getBatchEvaluations(@PathVariable Long batchId) {
         return ResponseEntity.ok(evaluationService.getEvaluationsByBatch(batchId));
@@ -31,7 +38,6 @@ public class EvaluationController {
     @PostMapping("/batch/{batchId}/calculate")
     public ResponseEntity<Void> runAggregation(@PathVariable Long batchId) {
         evaluationService.calculateBatchPerformance(batchId);
-        // KAFKA: Publish EvaluationUpdated event here [cite: 63, 103]
         return ResponseEntity.accepted().build();
     }
 }
