@@ -62,15 +62,16 @@
 ---
 
 ###  Evaluation APIs
-1. **Get evaluation by ID**  
-   `GET /evaluations/{evaluationId}`  
+1. **Submit evaluation**  
+   `POST /evaluations/submitEvaluation`  
+   Access: `TRAINER,TECH_LEAD,ADMIN` 
+2. **Get evaluation by BATCH ID**  
+   `GET /evaluations/batch/{batchId}`  
    Access: `ADMIN, TECH_LEAD, TRAINER`
-
-2. **Create evaluation for batch**  
+3. **Create evaluation for batch**  
    `POST /evaluations/batch/{batchId}/calculate`  
    Access: `ADMIN, TECH_LEAD, TRAINER`
-
-3. **Get evaluation by batch ID and associate ID**  
+4. **Get evaluation by batch ID and associate ID**  
    `GET /evaluations/batch/{batchId}/associate/{associateId}`  
    Access: `ALL ROLES`
 
