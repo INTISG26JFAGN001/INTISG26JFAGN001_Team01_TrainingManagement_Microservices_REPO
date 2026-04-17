@@ -202,7 +202,7 @@ public class AssessmentController {
             @ApiResponse(responseCode = "204", description = "Assessment deleted successfully."),
             @ApiResponse(responseCode = "404", description = "No assessment found with the provided ID.")
     })
-    @DeleteMapping("/assessmentId")
+    @DeleteMapping("/{assessmentId}")
     public ResponseEntity<Void> deleteAssessment(@PathVariable Long assessmentId) {
         assessmentService.deleteAssessment(assessmentId);
         return ResponseEntity.noContent().build();
