@@ -7,6 +7,7 @@ import com.cognizant.tes.dto.CourseResponseDTO;
 import com.cognizant.tes.entity.Batch;
 import com.cognizant.tes.entity.BatchStatus;
 import com.cognizant.tes.entity.CourseBatchMap;
+import com.cognizant.tes.exception.InvalidArgumentException;
 import com.cognizant.tes.exception.InvalidBatchException;
 import com.cognizant.tes.client.ICourseServiceClient;
 import com.cognizant.tes.mapper.BatchMapper;
@@ -67,10 +68,16 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     public Batch getBatchById(Long batchId) throws InvalidBatchException {
+        if (batchId < 0) {
+            throw new InvalidArgumentException("Batch ID must be non-negative");
+        }
         return batchDAO.findById(batchId);
     }
 
     public Batch deleteBatch(Long batchId) {
+        if (batchId < 0) {
+            throw new InvalidArgumentException("Batch ID must be non-negative");
+        }
         return batchDAO.deleteById(batchId);
     }
 
@@ -85,10 +92,20 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     public List<Batch> getBatchesByCourseId(Long courseId) {
+        if (courseId < 0) {
+            throw new InvalidArgumentException("Trainer ID must be non-negative");
+        }
         return batchDAO.findByCourseId(courseId);
     }
 
     public List<CourseResponseDTO> getCoursesForBatch(Long batchId) {
+        if (batchId < 0) {
+            throw new InvalidArgumentException("Course ID must be non-negative");
+        }
+        Batch batch = batchDAO.findById(batchId);
+        if (batch == null) {
+            throw new InvalidBatchException("Batch with id=" + batchId + " not found");
+        }
         List<Long> courseIds = courseBatchMapDAO.findCourseIdsByBatchId(batchId);
 
         return courseIds.stream()
@@ -98,10 +115,16 @@ public class BatchServiceImpl implements IBatchService {
 
 
     public List<Batch> getBatchByTrainerId(Long trainerId) {
+        if (trainerId < 0) {
+            throw new InvalidArgumentException("Course ID must be non-negative");
+        }
         return batchDAO.findByTrainerId(trainerId);
     }
 
     public Batch getBatchDetailsById(Long id) {
+        if (id < 0) {
+            throw new InvalidArgumentException("Batch ID must be non-negative");
+        }
         return batchDAO.findById(id);
     }
 

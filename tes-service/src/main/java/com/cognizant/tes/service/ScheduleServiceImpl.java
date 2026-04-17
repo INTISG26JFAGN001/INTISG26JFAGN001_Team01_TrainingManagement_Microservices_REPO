@@ -3,6 +3,7 @@ package com.cognizant.tes.service;
 import com.cognizant.tes.dao.IScheduleDAO;
 import com.cognizant.tes.dto.ScheduleDTO;
 import com.cognizant.tes.entity.Schedule;
+import com.cognizant.tes.exception.InvalidArgumentException;
 import com.cognizant.tes.mapper.ScheduleMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class ScheduleServiceImpl implements IScheduleService {
 
     @Override
     public Schedule getScheduleById(Long scheduleId) {
+        if (scheduleId < 0) {
+            throw new InvalidArgumentException("Schedule ID must be non-negative");
+        }
         return scheduleDAO.findById(scheduleId);
     }
 
@@ -39,11 +43,17 @@ public class ScheduleServiceImpl implements IScheduleService {
 
     @Override
     public Schedule updateSessionDate(Long scheduleId, LocalDateTime sessionDate) {
+        if (scheduleId < 0) {
+            throw new InvalidArgumentException("Schedule ID must be non-negative");
+        }
         return scheduleDAO.updateSessionDate(scheduleId, sessionDate);
     }
 
     @Override
     public List<Schedule> getSchedulesByBatchId(Long batchId) {
+        if (batchId < 0) {
+            throw new InvalidArgumentException("Batch ID must be non-negative");
+        }
         return scheduleDAO.findSchedulesByBatchId(batchId);
     }
 }

@@ -16,10 +16,10 @@ public class Enrollment {
     private Long enrollmentId;
 
     @ManyToOne
-    @JoinColumn(name="batch_id")
+    @JoinColumn(name="batch_id", nullable=false)
     private Batch batch;
 
-    @Column(name="associate_id")
+    @Column(name="associate_id", nullable= false)
     private Long associateId;
 
     @Enumerated(EnumType.STRING) //yy
