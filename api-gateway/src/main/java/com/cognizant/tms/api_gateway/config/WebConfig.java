@@ -194,9 +194,9 @@ public class WebConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.setAllowedOriginPatterns(List.of("*"));
-        config.setAllowedHeaders(List.of("*"));  // THIS WAS MISSING - Required for preflight
+        config.setAllowedHeaders(List.of("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setExposedHeaders(Arrays.asList("Content-Type", "Authorization", "Set-Cookie"));
+        config.setExposedHeaders(Arrays.asList("Content-Type", "Authorization", "Set-Cookie", "X-Total-Count"));
         config.setMaxAge(3600L);
 
         source.registerCorsConfiguration("/**", config);
