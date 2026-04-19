@@ -1,5 +1,6 @@
 package com.cognizant.pes.service;
 
+import com.cognizant.pes.dto.request.EvaluationRequestDTO;
 import com.cognizant.pes.dto.response.EvaluationResponseDTO;
 
 import java.util.List;
@@ -10,4 +11,6 @@ public interface IEvaluationService {
     EvaluationResponseDTO getAssociateEvaluation(Long batchId, Long associateId);
 
     void calculateBatchPerformance(Long batchId);
+
+    EvaluationResponseDTO submitEvaluation(EvaluationRequestDTO request);
 }

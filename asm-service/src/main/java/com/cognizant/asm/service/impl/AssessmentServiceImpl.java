@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class AssessmentServiceImpl implements AssessmentService {
 
@@ -38,6 +40,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     @Transactional(readOnly = true)
     public List<AssessmentSummaryResponse> listAll() {
+        log.info("Fetching all assessments");
         return assessmentDAO.findAll()
                 .stream()
                 .map(this::toSummary)
@@ -47,6 +50,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     @Transactional(readOnly = true)
     public List<AssessmentSummaryResponse> listByBatch(Long batchId) {
+        log.info("Fetching assessments for Batch ID: {}", batchId);
         return assessmentDAO.findByBatchId(batchId)
                 .stream()
                 .map(this::toSummary)
@@ -56,6 +60,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     @Transactional(readOnly = true)
     public List<AssessmentSummaryResponse> listByType(AssessmentType type) {
+        log.debug("Filtering assessments by Type: {}", type);
         return assessmentDAO.findByType(type)
                 .stream()
                 .map(this::toSummary)
@@ -65,6 +70,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     @Transactional(readOnly = true)
     public List<AssessmentSummaryResponse> listByStatus(AssessmentStatus status) {
+        log.debug("Filtering assessments by Status: {}", status);
         return assessmentDAO.findByStatus(status)
                 .stream()
                 .map(this::toSummary)
@@ -74,6 +80,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     @Transactional(readOnly = true)
     public List<AssessmentSummaryResponse> listByBatchAndType(Long batchId, AssessmentType type) {
+        log.info("Fetching assessments for Batch: {} and Type: {}", batchId, type);
         return assessmentDAO.findByBatchIdAndType(batchId, type)
                 .stream()
                 .map(this::toSummary)
@@ -83,6 +90,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     @Transactional(readOnly = true)
     public List<AssessmentSummaryResponse> listByBatchAndStatus(Long batchId, AssessmentStatus status) {
+        log.info("Fetching assessments for Batch: {} and Status: {}", batchId, status);
         return assessmentDAO.findByBatchIdAndStatus(batchId, status)
                 .stream()
                 .map(this::toSummary)
@@ -92,9 +100,14 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     @Transactional
     public AssessmentSummaryResponse updateAssessment(Long assessmentId, UpdateAssessmentRequest request) {
+        log.info("Request to update metadata for Assessment ID: {}", assessmentId);
         Assessment assessment = assessmentDAO.findById(assessmentId)
-                .orElseThrow(() -> new AssessmentNotFoundException(assessmentId));
+                .orElseThrow(() -> {
+                    log.error("Update failed: Assessment ID {} not found", assessmentId);
+                    return new AssessmentNotFoundException(assessmentId);
+                });
         if(request.getTitle() != null) {
+            log.debug("Updating title for ID {}: {} -> {}", assessmentId, assessment.getTitle(), request.getTitle());
             assessment.setTitle(request.getTitle());
         }
         if(request.getDueDate() != null){
@@ -104,19 +117,24 @@ public class AssessmentServiceImpl implements AssessmentService {
             assessment.setMaxScore(request.getMaxScore());
         }
         if(request.getStatus() != null){
+            log.info("Status change for Assessment {}: {} -> {}", assessmentId, assessment.getStatus(), request.getStatus());
             assessment.setStatus(request.getStatus());
         }
         Assessment saved = assessmentDAO.save(assessment);
+        log.info("Successfully updated Assessment ID: {}", assessmentId);
         return toSummary(saved);
     }
 
     @Override
     @Transactional
     public void deleteAssessment(Long assessmentId) {
+        log.warn("Attempting to delete Assessment ID: {}", assessmentId);
         Assessment assessment = assessmentDAO.findById(assessmentId)
                 .orElseThrow(() -> new AssessmentNotFoundException(assessmentId));
+        log.info("Cleaning up rubrics for Assessment ID: {}", assessmentId);
         rubricDAO.deleteByAssessmentId(assessmentId);
         assessmentDAO.deleteById(assessmentId);
+        log.warn("Assessment ID: {} successfully deleted", assessmentId);
     }
 
     private AssessmentSummaryResponse toSummary(Assessment assessment) {
