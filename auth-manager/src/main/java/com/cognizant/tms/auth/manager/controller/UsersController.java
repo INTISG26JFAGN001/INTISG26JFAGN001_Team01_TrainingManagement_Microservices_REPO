@@ -94,7 +94,7 @@ public class UsersController {
     }
 
 
-    @Operation(summary = "Get user by id (ADMIN ONLY)", description = "Fetches the details of a user based on the provided id")
+    @Operation(summary = "Get user by id", description = "Fetches the details of a user based on the provided id")
     @ApiResponses(value={
             @ApiResponse(responseCode="200",
                     content=@Content(mediaType="application/json",
@@ -149,7 +149,7 @@ public class UsersController {
     }
 
 
-    @Operation(summary = "Get user by username (ADMIN ONLY)", description = "Fetches the details of a user based on the provided username")
+    @Operation(summary = "Get user by username", description = "Fetches the details of a user based on the provided username")
     @ApiResponses(value={
             @ApiResponse(responseCode="200",
                     content=@Content(mediaType="application/json",
@@ -198,7 +198,7 @@ public class UsersController {
         return ResponseEntity.status(HttpStatus.OK).body(usersDTO);
     }
 
-    @Operation(summary = "Get user by email (ADMIN ONLY)", description = "Fetches the details of a user based on the provided email")
+    @Operation(summary = "Get user by email", description = "Fetches the details of a user based on the provided email")
     @ApiResponses(value={
             @ApiResponse(responseCode="200",
                     content=@Content(mediaType="application/json",
@@ -253,7 +253,7 @@ public class UsersController {
     }
 
 
-    @Operation(summary = "Get users by full name (ADMIN ONLY)", description = "Fetches the details of users based on" +
+    @Operation(summary = "Get users by full name", description = "Fetches the details of users based on" +
             " the provided full name. It returns a list of users whose full name contains the provided key")
     @ApiResponses(value={
             @ApiResponse(responseCode="200",

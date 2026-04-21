@@ -58,7 +58,7 @@ public class WebConfig {
                 auth.requestMatchers(HttpMethod.GET, "/technologies").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.GET, "/technologies/{id}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.PUT, "/technologies/{id}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD");
-                auth.requestMatchers(HttpMethod.DELETE, "/technologies").hasAnyRole("ADMIN","TECH_LEAD");
+                auth.requestMatchers(HttpMethod.DELETE, "/technologies/{id}").hasAnyRole("ADMIN","TECH_LEAD");
 
                 // Course Controller
                 auth.requestMatchers(HttpMethod.POST, "/courses").hasAnyRole("ADMIN","TECH_LEAD");
