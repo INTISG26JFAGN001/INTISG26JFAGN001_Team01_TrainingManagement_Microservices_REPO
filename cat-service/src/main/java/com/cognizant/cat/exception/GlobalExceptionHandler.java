@@ -41,7 +41,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGeneric(Exception ex, HttpServletRequest request) {
-
         ErrorResponseDTO response = new ErrorResponseDTO();
         response.setTimestamp(LocalDateTime.now());
         response.setErrorCode("S500");

@@ -65,14 +65,14 @@ public class WebConfig {
                 auth.requestMatchers(HttpMethod.GET, "/courses").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.GET, "/courses/{id}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.PUT, "/courses/{id}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD");
-                auth.requestMatchers(HttpMethod.DELETE, "/courses").hasAnyRole("ADMIN","TECH_LEAD");
+                auth.requestMatchers(HttpMethod.DELETE, "/courses/{id}").hasAnyRole("ADMIN","TECH_LEAD");
 
                 // Stage Controller
                 auth.requestMatchers(HttpMethod.POST, "/stages").hasAnyRole("ADMIN","TECH_LEAD");
                 auth.requestMatchers(HttpMethod.GET, "/stages").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.GET, "/stages/{id}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.PUT, "/stages/{id}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD");
-                auth.requestMatchers(HttpMethod.DELETE, "/stages").hasAnyRole("ADMIN","TECH_LEAD");
+                auth.requestMatchers(HttpMethod.DELETE, "/stages/{id}").hasAnyRole("ADMIN","TECH_LEAD");
 
                 // Associate Controller RBAC
                 auth.requestMatchers(HttpMethod.POST, "/associates/create").hasRole("ADMIN");
@@ -192,7 +192,6 @@ public class WebConfig {
     public CorsConfigurationSource corsConfigurationSource(){
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        System.out.println("Cors Config loaded");
         config.setAllowCredentials(true);
         config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedHeaders(List.of("*"));
