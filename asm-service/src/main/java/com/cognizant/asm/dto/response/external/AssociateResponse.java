@@ -6,6 +6,6 @@ import lombok.Data;
 public class AssociateResponse {
     private Long id;
     private Long userId;
-    private Long courseId;
+    private Long batchId;
     private Integer xp;
 }
