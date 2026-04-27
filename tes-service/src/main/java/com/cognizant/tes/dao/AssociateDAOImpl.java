@@ -52,7 +52,7 @@ public class AssociateDAOImpl implements IAssociateDAO {
         if(associate.isPresent()){
             result = associate.get();
         }else{
-            throw new InvalidAssociateException("Associate with user id: "+userId+" does not exist");
+            throw new InvalidAssociateException("Associate with user id: "+userId+" not found");
         }
         return result;
     }
@@ -67,12 +67,8 @@ public class AssociateDAOImpl implements IAssociateDAO {
     }
 
     @Override
-    public List<Associate> getByXp(int xp) throws InvalidAssociateException {
-        List<Associate> associates = associateRepository.findByXp(xp);
-        if(associates.isEmpty()){
-            throw new InvalidAssociateException("No associates found with xp: "+xp);
-        }
-        return associates;
+    public List<Associate> getByXp(int xp) {
+        return associateRepository.findByXp(xp);
     }
 
     @Override

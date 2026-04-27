@@ -11,7 +11,7 @@ public class Trainer {
     @Column(name="trainer_id")
     private Long trainerId;
 
-    @Column(name="user_id")
+    @Column(name="user_id", nullable=false, unique = true)
     private Long userId;
 
 

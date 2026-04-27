@@ -6,6 +6,7 @@ import com.cognizant.tes.dto.EnrollmentDTO;
 import com.cognizant.tes.entity.Batch;
 import com.cognizant.tes.entity.Enrollment;
 import com.cognizant.tes.entity.EnrollmentStatus;
+import com.cognizant.tes.exception.InvalidArgumentException;
 import com.cognizant.tes.exception.InvalidBatchException;
 import com.cognizant.tes.exception.InvalidEnrollmentException;
 import com.cognizant.tes.mapper.EnrollmentMapper;
@@ -36,6 +37,10 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
     }
 
     public Enrollment getEnrollmentById(Long id) {
+        if (id < 0) {
+            throw new InvalidArgumentException("Enrollment ID must be non-negative");
+        }
+
         return enrollmentDAO.findById(id);
     }
 
@@ -44,10 +49,16 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
     }
 
     public List<Enrollment> getEnrollmentsByBatchId(Long batchId) {
+        if (batchId < 0) {
+            throw new InvalidArgumentException("Batch ID must be non-negative");
+        }
         return enrollmentDAO.findByBatchId(batchId);
     }
 
     public Enrollment getEnrollmentByAssociateId(Long associateId) {
+        if (associateId < 0) {
+            throw new InvalidArgumentException("Associate ID must be non-negative");
+        }
         return enrollmentDAO.findByAssociateId(associateId);
     }
 
@@ -56,10 +67,16 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
     }
 
     public Enrollment updateStatus(Long id, EnrollmentStatus status) {
+        if (id < 0) {
+            throw new InvalidArgumentException("Enrollment ID must be non-negative");
+        }
         return enrollmentDAO.updateStatus(id, status);
     }
 
     public Enrollment deleteEnrollment(Long id) {
+        if (id < 0) {
+            throw new InvalidArgumentException("Enrollment ID must be non-negative");
+        }
         Enrollment enrollment = enrollmentDAO.findById(id);
         if (enrollment == null) {
             throw new InvalidEnrollmentException("Enrollment not found with id " + id);
