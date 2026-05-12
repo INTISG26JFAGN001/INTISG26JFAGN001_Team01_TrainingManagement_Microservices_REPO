@@ -6,7 +6,7 @@ import java.util.List;
 public record InterviewEvaluationResponseDTO(
         Long id,
 
-        Long assessorId,
+        Long assessmentId,
 
         Long associateId,
 

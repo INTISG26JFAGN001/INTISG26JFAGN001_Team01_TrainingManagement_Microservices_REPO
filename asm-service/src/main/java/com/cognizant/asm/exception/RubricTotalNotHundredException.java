@@ -9,7 +9,7 @@ public class RubricTotalNotHundredException extends RuntimeException {
     }
 
     public RubricTotalNotHundredException(Long interviewId, int currentTotal) {
-        super("Interview -n" + interviewId + " cannot be finalized: rubric weights must total exactly 100, " + "but current total is " + currentTotal + ". " +
+        super("Interview ID" + interviewId + " cannot be finalized: rubric weights must total exactly 100, " + "but current total is " + currentTotal + ". " +
                 "Please add or adjust rubric criteria so that the total weight equals 100.");
     }
 }
