@@ -54,6 +54,11 @@ public class GlobalExceptionHandler {
 
     // 400 - BAD REQUEST
 
+    @ExceptionHandler(InvalidQuestionIdException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidQuestionId(InvalidQuestionIdException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request, null);
+    }
+
     @ExceptionHandler(AssessmentNotAvailableException.class)
     public ResponseEntity<ErrorResponseDTO> handleNotAvailable(AssessmentNotAvailableException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request, null);

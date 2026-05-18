@@ -7,6 +7,7 @@ import com.cognizant.tes.dto.CourseResponseDTO;
 import com.cognizant.tes.entity.Batch;
 import com.cognizant.tes.entity.BatchStatus;
 import com.cognizant.tes.entity.CourseBatchMap;
+import com.cognizant.tes.entity.Trainer;
 import com.cognizant.tes.exception.InvalidArgumentException;
 import com.cognizant.tes.exception.InvalidBatchException;
 import com.cognizant.tes.client.ICourseServiceClient;
@@ -26,12 +27,14 @@ public class BatchServiceImpl implements IBatchService {
     private final IBatchDAO batchDAO;
     private final ICourseBatchMapDAO courseBatchMapDAO;
     private final ICourseServiceClient courseServiceClient;
+    private final ITrainerService trainerService;
 
     public BatchServiceImpl(IBatchDAO batchDAO, ICourseBatchMapDAO courseBatchMapDAO,
-                            ICourseServiceClient courseServiceClient) {
+                            ICourseServiceClient courseServiceClient,ITrainerService trainerService) {
         this.batchDAO = batchDAO;
         this.courseBatchMapDAO = courseBatchMapDAO;
         this.courseServiceClient = courseServiceClient;
+        this.trainerService = trainerService;
     }
     public List<Batch> getAllBatches() {
         return batchDAO.findAll();
@@ -53,6 +56,11 @@ public class BatchServiceImpl implements IBatchService {
             throw new InvalidBatchException("One or more course IDs are invalid");
         }
 
+        Long trainerId = batchDTO.getTrainerId();
+        Trainer trainer = trainerService.getTrainerById(trainerId);
+        if (trainer == null) {
+            throw new InvalidBatchException("Invalid Trainer Id: " + trainerId);
+        }
 
         Batch savedBatch = batchDAO.save(batch);
 

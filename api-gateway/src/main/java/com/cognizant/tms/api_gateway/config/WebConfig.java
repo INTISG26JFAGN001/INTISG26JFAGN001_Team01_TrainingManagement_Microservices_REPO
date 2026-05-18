@@ -48,8 +48,8 @@ public class WebConfig {
                 auth.requestMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll();
 
                 // User Controller RBAC
-                auth.requestMatchers(HttpMethod.GET, "/user/all").hasRole("ADMIN");
-                auth.requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("ADMIN", "TECH_LEAD", "TRAINER", "COACH");
+                auth.requestMatchers(HttpMethod.GET, "/user/all").hasAnyRole("ADMIN","TRAINER","TECH_LEAD");
+                auth.requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("ADMIN", "TECH_LEAD", "TRAINER", "COACH", "ASSOCIATE");
                 auth.requestMatchers(HttpMethod.PUT, "/user/**").hasAnyRole("ADMIN", "COACH");
                 auth.requestMatchers(HttpMethod.DELETE, "/user/**").hasRole("ADMIN");
 
@@ -77,6 +77,7 @@ public class WebConfig {
                 // Associate Controller RBAC
                 auth.requestMatchers(HttpMethod.POST, "/associates/create").hasRole("ADMIN");
                 auth.requestMatchers(HttpMethod.PUT, "/associates/update").hasRole("ADMIN");
+                auth.requestMatchers(HttpMethod.DELETE, "/associates/{id}").hasRole("ADMIN");
                 auth.requestMatchers(HttpMethod.GET, "/associates/{userId}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.GET, "/associates").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.GET, "/associates/batch").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
@@ -84,8 +85,8 @@ public class WebConfig {
 
                 // Batches Controller
                 auth.requestMatchers(HttpMethod.POST, "/batches").hasRole("ADMIN");
-                auth.requestMatchers(HttpMethod.GET, "/batches").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH");
-                auth.requestMatchers(HttpMethod.GET, "/batches/{id}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH");
+                auth.requestMatchers(HttpMethod.GET, "/batches").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
+                auth.requestMatchers(HttpMethod.GET, "/batches/{id}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.DELETE, "/batches/{id}").hasRole("ADMIN");
                 auth.requestMatchers(HttpMethod.PUT, "/batches/{id}/status").hasAnyRole("ADMIN","TRAINER");
                 auth.requestMatchers(HttpMethod.GET, "/batches/status").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH");
@@ -99,7 +100,7 @@ public class WebConfig {
                 auth.requestMatchers(HttpMethod.GET, "/enrollment/{id}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH");
                 auth.requestMatchers(HttpMethod.GET, "/enrollment").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH");
                 auth.requestMatchers(HttpMethod.GET, "/enrollment/batch").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH");
-                auth.requestMatchers(HttpMethod.GET, "/enrollment/associate").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH");
+                auth.requestMatchers(HttpMethod.GET, "/enrollment/associate").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.PUT, "/enrollment/{id}/status").hasRole("ADMIN");
                 auth.requestMatchers(HttpMethod.GET, "/enrollment/status").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH");
                 auth.requestMatchers(HttpMethod.DELETE, "/enrollment/{id}").hasRole("ADMIN");
@@ -175,10 +176,10 @@ public class WebConfig {
                 auth.requestMatchers(HttpMethod.GET, "/evaluations/batch/{batchId}/associate/{associateId}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
 
                 // Interview Evaluation Controller
-                auth.requestMatchers(HttpMethod.POST, "/interview-evaluations").hasRole("TRAINER");
-                auth.requestMatchers(HttpMethod.GET, "/interview-evaluations/assessment/{assessmentId}/associate/{associateId}").hasAnyRole("TRAINER","ASSOCIATE");
-                auth.requestMatchers(HttpMethod.GET, "/interview-evaluations/assessment/{assessmentId}").hasRole("TRAINER");
-                auth.requestMatchers(HttpMethod.GET, "/interview-evaluations/associate/{associateId}").hasAnyRole("TRAINER","ASSOCIATE");
+                auth.requestMatchers(HttpMethod.POST, "/interview-evaluations").hasAnyRole("ADMIN","TRAINER","TECH_LEAD");
+                auth.requestMatchers(HttpMethod.GET, "/interview-evaluations/assessment/{assessmentId}/associate/{associateId}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","ASSOCIATE");
+                auth.requestMatchers(HttpMethod.GET, "/interview-evaluations/assessment/{assessmentId}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD");
+                auth.requestMatchers(HttpMethod.GET, "/interview-evaluations/associate/{associateId}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","ASSOCIATE");
 
                 auth.anyRequest().denyAll();
             });
