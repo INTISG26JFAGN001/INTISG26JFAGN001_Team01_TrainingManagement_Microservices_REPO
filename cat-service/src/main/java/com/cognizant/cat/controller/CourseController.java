@@ -141,7 +141,7 @@ public class CourseController {
     @PostMapping
     public ResponseEntity<CourseResponseDTO> create(@Valid @RequestBody CourseRequestDTO dto) {
 
-        CourseResponseDTO response=service.create(dto);
+        CourseResponseDTO response= (CourseResponseDTO) service.create(dto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -292,7 +292,7 @@ public class CourseController {
             @Parameter(description = "The unique identifier of the course to retrieve", example = "1")
             @PathVariable Long id) {
 
-        return ResponseEntity.ok(service.getById(id));
+        return ResponseEntity.ok((CourseResponseDTO) service.getById(id));
     }
 
     @Operation(summary = "Update Course Endpoint",
@@ -386,7 +386,7 @@ public class CourseController {
             @PathVariable Long id, 
             @RequestBody CourseRequestDTO dto) {
 
-        return ResponseEntity.ok(service.update(id, dto));
+        return ResponseEntity.ok((CourseResponseDTO) service.update(id, dto));
     }
 
     @Operation(summary = "Delete Course Endpoint",

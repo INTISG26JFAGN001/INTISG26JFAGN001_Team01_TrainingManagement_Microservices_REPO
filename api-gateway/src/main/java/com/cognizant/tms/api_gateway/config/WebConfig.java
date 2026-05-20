@@ -49,7 +49,7 @@ public class WebConfig {
 
                 // User Controller RBAC
                 auth.requestMatchers(HttpMethod.GET, "/user/all").hasRole("ADMIN");
-                auth.requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("ADMIN", "TECH_LEAD", "TRAINER", "COACH");
+                auth.requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("ADMIN", "TECH_LEAD", "TRAINER", "COACH", "ASSOCIATE");
                 auth.requestMatchers(HttpMethod.PUT, "/user/**").hasAnyRole("ADMIN", "COACH");
                 auth.requestMatchers(HttpMethod.DELETE, "/user/**").hasRole("ADMIN");
 
