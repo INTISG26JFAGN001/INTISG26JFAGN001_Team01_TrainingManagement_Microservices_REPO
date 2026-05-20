@@ -48,7 +48,7 @@ public class WebConfig {
                 auth.requestMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll();
 
                 // User Controller RBAC
-                auth.requestMatchers(HttpMethod.GET, "/user/all").hasAnyRole("ADMIN","TRAINER","TECH_LEAD");
+                auth.requestMatchers(HttpMethod.GET, "/user/all").hasAnyRole("ADMIN");
                 auth.requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("ADMIN", "TECH_LEAD", "TRAINER", "COACH", "ASSOCIATE");
                 auth.requestMatchers(HttpMethod.PUT, "/user/**").hasAnyRole("ADMIN", "COACH");
                 auth.requestMatchers(HttpMethod.DELETE, "/user/**").hasRole("ADMIN");

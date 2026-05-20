@@ -100,7 +100,7 @@ public class TrainerController {
         Trainer savedTrainer = trainerService.addTrainer(trainer, trainerDTO.getTechnologyIds());
         List<Long> ids = getTechnologyIds(savedTrainer.getTrainerId());
         List<String> names = ids.stream()
-                .map(id -> courseServiceClient.getTechnologyById(id).getName())
+                .map(this::getTechnologyName)
                 .toList();
         return TrainerMapper.toDTO(savedTrainer, ids, names);
     }
@@ -202,7 +202,7 @@ public class TrainerController {
         Trainer trainer = trainerService.getTrainerById(trainerId);
         List<Long> ids = getTechnologyIds(trainer.getTrainerId());
         List<String> names = ids.stream()
-                .map(id -> courseServiceClient.getTechnologyById(id).getName())
+                .map(this::getTechnologyName)
                 .toList();
         return TrainerMapper.toDTO(trainer, ids, names);
     }
@@ -300,11 +300,11 @@ public class TrainerController {
             )
     })
     @DeleteMapping("/{trainerId}")
-    public TrainerDTO deleteTrainer( @PathVariable Long trainerId) {
+    public TrainerDTO deleteTrainer(@PathVariable Long trainerId) {
         Trainer trainer = trainerService.deleteTrainer(trainerId);
         List<Long> ids = getTechnologyIds(trainer.getTrainerId());
         List<String> names = ids.stream()
-                .map(id -> courseServiceClient.getTechnologyById(id).getName())
+                .map(this::getTechnologyName)
                 .toList();
         return TrainerMapper.toDTO(trainer, ids, names);
     }
@@ -586,12 +586,12 @@ public class TrainerController {
             )
     })
     @PutMapping("/{trainerId}/technologies")
-    public TrainerDTO updateTrainerTechnologyIds( @PathVariable Long trainerId,
-                                                 @RequestBody List<Long> technologyIds) {
+    public TrainerDTO updateTrainerTechnologyIds(@PathVariable Long trainerId,
+                                                @RequestBody List<Long> technologyIds) {
         Trainer updatedTrainer = trainerService.updateTrainerTechnologyIds(trainerId, technologyIds);
         List<Long> ids = getTechnologyIds(updatedTrainer.getTrainerId());
         List<String> names = ids.stream()
-                .map(id -> courseServiceClient.getTechnologyById(id).getName())
+                .map(this::getTechnologyName)
                 .toList();
         return TrainerMapper.toDTO(updatedTrainer, ids, names);
     }

@@ -196,8 +196,14 @@ import java.util.stream.Collectors;
                     .map(batch -> {
                         List<Long> courseIds = courseBatchMapDAO.findCourseIdsByBatchId(batch.getBatchId());
                         List<String> courseNames = courseIds.stream()
-                                .map(courseServiceClient::getCourseById)
-                                .map(CourseResponseDTO::getTitle)
+                                .map(id -> {
+                                    try {
+                                        CourseResponseDTO c = courseServiceClient.getCourseById(id);
+                                        return c != null ? c.getTitle() : "Course #" + id;
+                                    } catch (Exception e) {
+                                        return "Course #" + id;
+                                    }
+                                })
                                 .collect(Collectors.toList());
 
                         BatchDTO dto = new BatchDTO();
@@ -315,8 +321,14 @@ import java.util.stream.Collectors;
 
             List<Long> courseIds = courseBatchMapDAO.findCourseIdsByBatchId(batch.getBatchId());
             List<String> courseNames = courseIds.stream()
-                    .map(courseServiceClient::getCourseById)
-                    .map(CourseResponseDTO::getTitle)
+                    .map(cid -> {
+                        try {
+                            CourseResponseDTO c = courseServiceClient.getCourseById(cid);
+                            return c != null ? c.getTitle() : "Course #" + cid;
+                        } catch (Exception e) {
+                            return "Course #" + cid;
+                        }
+                    })
                     .collect(Collectors.toList());
 
             BatchDTO dto = new BatchDTO();
