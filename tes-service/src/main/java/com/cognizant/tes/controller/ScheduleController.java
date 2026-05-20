@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -448,5 +449,16 @@ public class ScheduleController {
     public List<ScheduleDTO> getSchedulesByBatchId(@RequestParam("id") Long batchId) {
         List<Schedule> schedules = scheduleService.getSchedulesByBatchId(batchId);
         return schedules.stream().map(ScheduleMapper::toDTO).toList();
+    }
+
+
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity<ScheduleDTO> deleteScheduleById(@PathVariable Long scheduleId){
+        ScheduleDTO schedule = ScheduleMapper.toDTO(scheduleService.deleteById(scheduleId));
+        if(schedule==null){
+            return ResponseEntity.status(404).body(null);
+        }
+        scheduleService.deleteById(scheduleId);
+        return ResponseEntity.status(200).body(schedule);
     }
 }
