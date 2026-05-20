@@ -12,4 +12,5 @@ public interface IScheduleService {
     List<Schedule> getAllSchedules();
     Schedule updateSessionDate(Long scheduleId, LocalDateTime sessionDate);
     List<Schedule> getSchedulesByBatchId(Long batchId);
+    Schedule deleteById(Long scheduleId);
 }

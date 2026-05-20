@@ -11,5 +11,5 @@ public interface IScheduleDAO {
     List<Schedule> findAll();
     Schedule updateSessionDate(Long scheduleId, LocalDateTime sessionDate);
     List<Schedule> findSchedulesByBatchId(Long batchId);
-
+    Schedule deleteById(Long id);
 }

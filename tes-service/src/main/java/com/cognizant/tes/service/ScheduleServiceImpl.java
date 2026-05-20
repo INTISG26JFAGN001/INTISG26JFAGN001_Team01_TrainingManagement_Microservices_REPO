@@ -56,4 +56,9 @@ public class ScheduleServiceImpl implements IScheduleService {
         }
         return scheduleDAO.findSchedulesByBatchId(batchId);
     }
+
+    @Override
+    public Schedule deleteById(Long scheduleId) {
+        return scheduleDAO.deleteById(scheduleId);
+    }
 }
