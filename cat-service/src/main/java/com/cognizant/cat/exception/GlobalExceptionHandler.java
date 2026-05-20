@@ -2,6 +2,7 @@ package com.cognizant.cat.exception;
 
 import com.cognizant.cat.dto.ErrorResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,16 @@ public class GlobalExceptionHandler {
         response.setMessage(errorMessage);
         response.setPath(request.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest request) {
+        ErrorResponseDTO response = new ErrorResponseDTO();
+        response.setTimestamp(LocalDateTime.now());
+        response.setErrorCode("C409");
+        response.setMessage("Cannot delete: this item is referenced by existing courses or trainers. Remove the references first.");
+        response.setPath(request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(Exception.class)
