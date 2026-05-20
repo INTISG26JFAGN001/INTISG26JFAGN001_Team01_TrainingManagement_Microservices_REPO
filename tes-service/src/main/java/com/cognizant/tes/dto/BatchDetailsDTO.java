@@ -1,6 +1,7 @@
 package com.cognizant.tes.dto;
 
 import com.cognizant.tes.entity.BatchStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -12,7 +13,9 @@ public class BatchDetailsDTO {
     private Long id;
     private Long trainerId;
     private BatchStatus status;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endDate;
     @NotEmpty(message = "Course IDs must be provided")
     private List<Long> courseIds;

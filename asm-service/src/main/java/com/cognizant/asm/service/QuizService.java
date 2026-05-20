@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface QuizService {
 
-    QuizDetailResponse createQuiz(CreateQuizRequest request, Long createdBy);
+    QuizDetailResponse createQuiz(CreateQuizRequest request, Long createdBy, String userRole);
     QuizDetailResponse getQuizById(Long quizId);
     List<AssessmentSummaryResponse> listQuizzesByBatch(Long batchId);
     List<AssessmentSummaryResponse> listQuizzesByBatchAndStatus(Long batchId, AssessmentStatus status);

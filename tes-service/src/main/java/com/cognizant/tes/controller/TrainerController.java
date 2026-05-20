@@ -385,7 +385,7 @@ public class TrainerController {
                 .map(trainer -> {
                     List<Long> ids = getTechnologyIds(trainer.getTrainerId());
                     List<String> names = ids.stream()
-                            .map(id -> courseServiceClient.getTechnologyById(id).getName())
+                            .map(this::getTechnologyName)
                             .toList();
                     return TrainerMapper.toDTO(trainer, ids, names);
                 })
@@ -485,7 +485,7 @@ public class TrainerController {
                 .map(trainer -> {
                     List<Long> ids = getTechnologyIds(trainer.getTrainerId());
                     List<String> names = ids.stream()
-                            .map(id -> courseServiceClient.getTechnologyById(id).getName())
+                            .map(this::getTechnologyName)
                             .toList();
                     return TrainerMapper.toDTO(trainer, ids, names);
                 })
@@ -708,5 +708,14 @@ public class TrainerController {
                 .toList();
     }
 
+    /** Null-safe technology name lookup — returns "Unknown" if the tech no longer exists or the call fails. */
+    private String getTechnologyName(Long id) {
+        try {
+            TechnologyResponseDTO tech = courseServiceClient.getTechnologyById(id);
+            return (tech != null) ? tech.getName() : "Unknown";
+        } catch (Exception e) {
+            return "Unknown";
+        }
+    }
 
 }

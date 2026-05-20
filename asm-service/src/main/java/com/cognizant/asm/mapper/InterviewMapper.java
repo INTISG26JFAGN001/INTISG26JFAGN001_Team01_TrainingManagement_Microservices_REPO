@@ -67,6 +67,7 @@ public class InterviewMapper {
         r.setDueDate(interview.getDueDate());
         r.setMaxScore(interview.getMaxScore());
         r.setCreatedBy(interview.getCreatedBy());
+        r.setInterviewCategory(interview.getInterviewCategory());
         return r;
     }
 

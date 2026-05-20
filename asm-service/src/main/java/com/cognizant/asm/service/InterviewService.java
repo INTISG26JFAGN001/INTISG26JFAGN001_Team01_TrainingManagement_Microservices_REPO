@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface InterviewService {
 
-    InterviewDetailResponse createInterview(CreateInterviewRequest request, Long createdBy);
+    InterviewDetailResponse createInterview(CreateInterviewRequest request, Long createdBy, String userRole);
     InterviewDetailResponse getInterviewById(Long interviewId);
     List<AssessmentSummaryResponse> listInterviewsByBatch(Long batchId);
     List<AssessmentSummaryResponse> listInterviewsByBatchAndCategory(Long batchId, InterviewCategory category);

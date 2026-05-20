@@ -78,8 +78,11 @@ public class InterviewController {
             )
     })
     @PostMapping
-    public ResponseEntity<InterviewDetailResponse> createInterview(@Valid @RequestBody CreateInterviewRequest request, @RequestHeader(value = "X-User-Id", defaultValue = "0") Long createdBy) {
-        InterviewDetailResponse response = interviewService.createInterview(request, createdBy);
+    public ResponseEntity<InterviewDetailResponse> createInterview(
+            @Valid @RequestBody CreateInterviewRequest request,
+            @RequestHeader(value = "X-User-Id",   defaultValue = "0")  Long   createdBy,
+            @RequestHeader(value = "X-User-Role", defaultValue = "")   String userRole) {
+        InterviewDetailResponse response = interviewService.createInterview(request, createdBy, userRole);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

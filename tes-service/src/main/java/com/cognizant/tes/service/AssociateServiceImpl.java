@@ -22,6 +22,7 @@ public class AssociateServiceImpl implements IAssociateService {
 
     @Override
     public boolean create(Associate associate) {
+        // call auth-manager to create the user first with the following data and get the userId to store in this associateDAO
         return associateDAO.create(associate);
     }
 

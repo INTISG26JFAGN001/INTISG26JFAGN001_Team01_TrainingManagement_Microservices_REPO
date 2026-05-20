@@ -1,8 +1,10 @@
 package com.cognizant.tes.service;
 
+import com.cognizant.tes.dao.IAssociateDAO;
 import com.cognizant.tes.dao.IBatchDAO;
 import com.cognizant.tes.dao.IEnrollmentDAO;
 import com.cognizant.tes.dto.EnrollmentDTO;
+import com.cognizant.tes.entity.Associate;
 import com.cognizant.tes.entity.Batch;
 import com.cognizant.tes.entity.Enrollment;
 import com.cognizant.tes.entity.EnrollmentStatus;
@@ -22,10 +24,12 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
 
     private final IBatchDAO batchDAO;
     private final IEnrollmentDAO enrollmentDAO;
+    private final IAssociateDAO associateDAO;
 
-    public EnrollmentServiceImpl(IBatchDAO batchDAO, IEnrollmentDAO enrollmentDAO) {
+    public EnrollmentServiceImpl(IBatchDAO batchDAO, IEnrollmentDAO enrollmentDAO, IAssociateDAO associateDAO) {
         this.batchDAO = batchDAO;
         this.enrollmentDAO = enrollmentDAO;
+        this.associateDAO = associateDAO;
     }
 
     public Enrollment createEnrollment(EnrollmentDTO dto) {
@@ -33,6 +37,14 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
         Enrollment enrollment = EnrollmentMapper.toEntity(dto, batch);
         batch.addEnrollment(enrollment);
         batchDAO.save(batch);
+
+        // Sync the associate's batchId so GET /associates/{userId} reflects the enrollment
+        try {
+            Associate associate = associateDAO.getById(dto.getAssociateId());
+            associate.setBatchId(dto.getBatchId());
+            associateDAO.update(associate);
+        } catch (Exception ignored) {}
+
         return enrollment;
     }
 

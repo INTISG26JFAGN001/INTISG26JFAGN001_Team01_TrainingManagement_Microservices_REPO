@@ -2,6 +2,7 @@ package com.cognizant.asm.dto.response;
 
 import com.cognizant.asm.enums.AssessmentType;
 import com.cognizant.asm.enums.AssessmentStatus;
+import com.cognizant.asm.enums.InterviewCategory;
 
 import lombok.Data;
 import java.time.LocalDate;
@@ -18,4 +19,7 @@ public class AssessmentSummaryResponse {
     private LocalDate dueDate;
     private Integer maxScore;
     private Long createdBy;
+
+    /** Populated only for INTERVIEW type assessments. */
+    private InterviewCategory interviewCategory;
 }

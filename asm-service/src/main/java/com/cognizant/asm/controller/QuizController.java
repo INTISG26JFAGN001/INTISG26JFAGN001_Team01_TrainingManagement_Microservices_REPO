@@ -92,8 +92,11 @@ public class QuizController {
             )
     })
     @PostMapping
-    public ResponseEntity<QuizDetailResponse> createQuiz(@Valid @RequestBody CreateQuizRequest request, @RequestHeader(value = "X-User-Id", defaultValue = "0") Long createdBy) {
-        QuizDetailResponse response = quizService.createQuiz(request, createdBy);
+    public ResponseEntity<QuizDetailResponse> createQuiz(
+            @Valid @RequestBody CreateQuizRequest request,
+            @RequestHeader(value = "X-User-Id",   defaultValue = "0")  Long   createdBy,
+            @RequestHeader(value = "X-User-Role", defaultValue = "")   String userRole) {
+        QuizDetailResponse response = quizService.createQuiz(request, createdBy, userRole);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

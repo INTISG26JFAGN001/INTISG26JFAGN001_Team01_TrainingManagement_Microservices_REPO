@@ -204,6 +204,8 @@ import java.util.stream.Collectors;
                         dto.setId(batch.getBatchId());
                         dto.setTrainerId(batch.getTrainerId());
                         dto.setStatus(batch.getStatus());
+                        dto.setStartDate(batch.getStartDate());
+                        dto.setEndDate(batch.getEndDate());
                         dto.setCourseNames(courseNames);
                         return dto;
                     })

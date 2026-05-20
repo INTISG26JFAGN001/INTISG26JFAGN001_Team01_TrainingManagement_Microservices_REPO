@@ -14,6 +14,7 @@ import java.util.Map;
 
 @Component
 public class AuthUtil implements IAuthUtil{
+
     @Value("${jwt.auth-gen.secret-key}")
     private String key;
 

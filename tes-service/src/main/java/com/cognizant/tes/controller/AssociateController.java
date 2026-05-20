@@ -581,4 +581,32 @@ public class AssociateController {
         return ResponseEntity.ok("Associate updated successfully");
     }
 
+    @Operation(summary = "Delete Associate",
+            description = "Deletes an associate by their primary key ID. " +
+                    "If the associate exists, they are removed from the system. " +
+                    "This does NOT delete the associated user account. " +
+                    "If the associate does not exist, a 404 error is returned.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Associate deleted successfully",
+                    content = @Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(name = "Success", value = "Associate deleted successfully")})),
+            @ApiResponse(responseCode = "404",
+                    description = "Associate not found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class))),
+            @ApiResponse(responseCode = "500",
+                    description = "Unexpected server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)))
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteAssociate(@PathVariable long id) {
+        boolean deleted = associateService.deleteById(id);
+        if (deleted) {
+            return ResponseEntity.ok("Associate deleted successfully");
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete associate");
+    }
+
 }
