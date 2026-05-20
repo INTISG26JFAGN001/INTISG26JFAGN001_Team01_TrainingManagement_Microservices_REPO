@@ -419,12 +419,15 @@ public class TechnologyController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(
+    public ResponseEntity<TechnologyResponseDTO> delete(
             @Parameter(description = "The unique identifier of the technology to delete", example = "1")
             @PathVariable Long id) {
-
+        TechnologyResponseDTO t = service.getById(id);
+        if(t==null){
+            return ResponseEntity.status(404).body(null);
+        }
         service.delete(id);
 
-        return ResponseEntity.ok("Technology deleted successfully");
+        return ResponseEntity.ok(t);
     }
 }
