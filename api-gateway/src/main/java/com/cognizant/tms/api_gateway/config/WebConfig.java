@@ -107,10 +107,10 @@ public class WebConfig {
 
                 // Schedule Controller
                 auth.requestMatchers(HttpMethod.POST, "/schedule").hasRole("ADMIN");
+                auth.requestMatchers(HttpMethod.GET, "/schedule/batch").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.GET, "/schedule/{scheduleId}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH");
                 auth.requestMatchers(HttpMethod.GET, "/schedule").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH");
                 auth.requestMatchers(HttpMethod.PUT, "/schedule/{scheduleId}/session-date").hasAnyRole("ADMIN","TRAINER");
-                auth.requestMatchers(HttpMethod.GET, "/schedule/batch").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
 
                 // Trainer Controller
                 auth.requestMatchers(HttpMethod.POST, "/trainer").hasRole("ADMIN");

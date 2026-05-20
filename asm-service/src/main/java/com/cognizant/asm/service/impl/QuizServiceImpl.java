@@ -59,7 +59,7 @@ public class QuizServiceImpl implements QuizService {
         validateBatchId(request.getBatchId());
         // Admins do not have a trainer record in TES — skip trainer validation for ROLE_ADMIN
         if (!"ROLE_ADMIN".equalsIgnoreCase(userRole)) {
-            validateTrainer(createdBy);
+            validateTrainer(request.getTrainerId());
         } else {
             log.debug("Trainer validation skipped — creator is ROLE_ADMIN (userId: {})", createdBy);
         }

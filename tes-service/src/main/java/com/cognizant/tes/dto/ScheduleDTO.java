@@ -1,5 +1,6 @@
 package com.cognizant.tes.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 
 public class ScheduleDTO {
@@ -7,6 +8,7 @@ public class ScheduleDTO {
 
     private Long batchId;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime sessionDate;
 
     public Long getScheduleId() {
