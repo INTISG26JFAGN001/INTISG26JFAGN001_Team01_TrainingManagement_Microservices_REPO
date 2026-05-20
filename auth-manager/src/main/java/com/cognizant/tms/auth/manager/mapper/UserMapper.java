@@ -40,7 +40,7 @@ public class UserMapper {
                 .collect(Collectors.toList()));
     }
     public UsersDTO mapToUsersDTO(Users users){
-        return new UsersDTO(users.getId(), users.getEmail(), users.getFullName(), users.getEmail(),
+        return new UsersDTO(users.getId(), users.getUsername(), users.getFullName(), users.getEmail(),
                 users.getRoles().stream()
                         .map(r->{
                             if(r.getRoleName() != null){

@@ -2,6 +2,7 @@ package com.cognizant.tes.dto;
 
 import java.util.List;
 
+
 public class TrainerDTO {
     private Long trainerId;
     private Long userId;

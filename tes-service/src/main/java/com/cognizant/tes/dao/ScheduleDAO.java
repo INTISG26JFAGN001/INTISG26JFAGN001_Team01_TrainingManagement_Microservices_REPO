@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class ScheduleDAO implements IScheduleDAO{
@@ -40,5 +41,17 @@ public class ScheduleDAO implements IScheduleDAO{
 
     public List<Schedule> findSchedulesByBatchId(Long batchId) {
         return scheduleRepository.findByBatchId(batchId);
+    }
+
+    @Override
+    public Schedule deleteById(Long id) {
+        Optional<Schedule> s = scheduleRepository.findById(id);
+
+        if(s.isPresent()) {
+            scheduleRepository.deleteById(id);
+            return s.get();
+        }else{
+            return null;
+        }
     }
 }

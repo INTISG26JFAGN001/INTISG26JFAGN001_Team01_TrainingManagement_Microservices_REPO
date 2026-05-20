@@ -25,7 +25,7 @@ public class EnrollmentDAOImpl implements IEnrollmentDAO{
 
     public Enrollment findById(Long id) {
         return enrollmentRepository.findById(id).orElseThrow(()->
-                new InvalidEnrollmentException("Invalid enrollment id")
+                new InvalidEnrollmentException("Enrollment not found with id "+id)
         );
     }
 

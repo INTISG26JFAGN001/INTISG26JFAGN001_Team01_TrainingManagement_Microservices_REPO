@@ -1,9 +1,12 @@
 package com.cognizant.pes.service.impl;
 
+import com.cognizant.pes.dao.impl.ProjectDAOImpl;
 import com.cognizant.pes.dao.impl.ReviewDAOImpl;
+import com.cognizant.pes.domain.Project;
 import com.cognizant.pes.dto.request.ReviewRequestDTO;
 import com.cognizant.pes.dto.response.ReviewResponseDTO;
 import com.cognizant.pes.domain.Review;
+import com.cognizant.pes.exception.ResourceNotFoundException;
 import com.cognizant.pes.mapper.ReviewMapper;
 import com.cognizant.pes.service.IReviewService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,19 +25,35 @@ public class ReviewService implements IReviewService {
     private ReviewDAOImpl reviewDAO;
 
     @Autowired
+    private ProjectDAOImpl projectDAO;
+
+    @Autowired
     private ReviewMapper reviewMapper;
 
     @Override
     @Transactional
-    public ReviewResponseDTO saveReview(Long projectId, ReviewRequestDTO request) {
+    public ReviewResponseDTO saveReview(Long projectId, ReviewRequestDTO request) throws ResourceNotFoundException {
+
         log.info("Creating a new review for project ID: {}", projectId);
 
+        Project project = projectDAO.findById(projectId);
+
+        if (project == null) {
+            log.error("Project with ID: {} does not exist", projectId);
+            throw new ResourceNotFoundException(
+                    "Project not found with id: " + projectId);
+        }
         Review review = reviewMapper.toDomain(request);
-        review.setProjectId(projectId);
+
+        review.setProject(project);
 
         Review savedReview = reviewDAO.save(review);
 
-        log.info("Successfully saved review with ID: {} for project: {}", savedReview.getId(), projectId);
+        log.info(
+                "Successfully saved review with ID: {} for project: {}",
+                savedReview.getId(), projectId
+        );
+
         return reviewMapper.toDto(savedReview);
     }
 

@@ -18,6 +18,7 @@ import com.cognizant.asm.exception.AssessmentNotFoundException;
 import com.cognizant.asm.exception.AttemptNotFoundException;
 import com.cognizant.asm.exception.AssessmentNotAvailableException;
 import com.cognizant.asm.exception.DuplicateAttemptException;
+import com.cognizant.asm.exception.InvalidQuestionIdException;
 import com.cognizant.asm.exception.UserNotFoundException;
 import com.cognizant.asm.exception.BatchNotFoundException;
 
@@ -53,10 +54,15 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     @Transactional
-    public QuizDetailResponse createQuiz(CreateQuizRequest request, Long createdBy) {
-        log.info("Request to create new Quiz for Batch: {} by Trainer: {}", request.getBatchId(), createdBy);
+    public QuizDetailResponse createQuiz(CreateQuizRequest request, Long createdBy, String userRole) {
+        log.info("Request to create new Quiz for Batch: {} by User: {} (role: {})", request.getBatchId(), createdBy, userRole);
         validateBatchId(request.getBatchId());
-        validateTrainer(createdBy);
+        // Admins do not have a trainer record in TES — skip trainer validation for ROLE_ADMIN
+        if (!"ROLE_ADMIN".equalsIgnoreCase(userRole)) {
+            validateTrainer(request.getTrainerId());
+        } else {
+            log.debug("Trainer validation skipped — creator is ROLE_ADMIN (userId: {})", createdBy);
+        }
         Quiz quiz = quizMapper.toEntity(request);
         quiz.setCreatedBy(createdBy);
         List<QuizQuestion> questions = new ArrayList<>();
@@ -129,14 +135,21 @@ public class QuizServiceImpl implements QuizService {
         Map<Long, QuizQuestion> quizQuestionMap = quiz.getQuestions().stream()
                 .collect(Collectors.toMap(QuizQuestion::getId, q -> q));
 
+        // Pre-compute valid IDs once — used in error messages if a bad questionId is submitted
+        List<Long> validQuestionIds = quiz.getQuestions().stream()
+                .map(QuizQuestion::getId)
+                .sorted()
+                .collect(Collectors.toList());
+
         int totalScore = 0;
         List<QuizAttemptAnswer> attemptAnswers = new ArrayList<>();
 
         for(QuizAttemptAnswerRequest ansReq : request.getAnswers()) {
             QuizQuestion question = quizQuestionMap.get(ansReq.getQuestionId());
             if(question == null) {
-                log.warn("Question ID {} not found in Quiz {}, skipping answer", ansReq.getQuestionId(), quizId);
-                continue;
+                log.warn("Invalid question ID {} submitted for Quiz {}. Valid IDs: {}",
+                        ansReq.getQuestionId(), quizId, validQuestionIds);
+                throw new InvalidQuestionIdException(ansReq.getQuestionId(), quizId, validQuestionIds);
             }
 
             boolean isCorrect = ansReq.getSelectedOption() != null && ansReq.getSelectedOption() == question.getCorrectOption();

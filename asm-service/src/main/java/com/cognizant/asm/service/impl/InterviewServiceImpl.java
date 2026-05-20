@@ -52,10 +52,14 @@ public class InterviewServiceImpl implements InterviewService {
 
     @Override
     @Transactional
-    public InterviewDetailResponse createInterview(CreateInterviewRequest request, Long createdBy) {
-        log.info("Request to create Interview for Batch: {} by User: {}", request.getBatchId(), createdBy);
+    public InterviewDetailResponse createInterview(CreateInterviewRequest request, Long createdBy, String userRole) {
+        log.info("Request to create Interview for Batch: {} by User: {} (role: {})", request.getBatchId(), createdBy, userRole);
         validateBatchId(request.getBatchId());
-        validateTrainer(createdBy);
+        if (!"ROLE_ADMIN".equalsIgnoreCase(userRole)) {
+            validateTrainer(createdBy);
+        } else {
+            log.debug("Trainer validation skipped — creator is ROLE_ADMIN (userId: {})", createdBy);
+        }
         Interview interview = interviewMapper.toEntity(request);
         interview.setCreatedBy(createdBy);
         Interview saved = interviewDAO.save(interview);

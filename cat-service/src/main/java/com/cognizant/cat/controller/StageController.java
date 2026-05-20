@@ -487,12 +487,15 @@ public class StageController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(
+    public ResponseEntity<StageResponseDTO> delete(
             @Parameter(description = "The unique identifier of the stage to delete", example = "1")
             @PathVariable Long id) {
-
+        StageResponseDTO stage = service.getById(id);
+        if(stage==null){
+            return ResponseEntity.status(404).body(null);
+        }
         service.delete(id);
 
-        return ResponseEntity.ok("Stage deleted successfully");
+        return ResponseEntity.ok(stage);
     }
 }

@@ -459,13 +459,16 @@ public class CourseController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(
+    public ResponseEntity<CourseResponseDTO> delete(
             @Parameter(description = "The unique identifier of the course to delete", example = "1")
             @PathVariable Long id) {
-
+        CourseResponseDTO course = service.getById(id);
+        if(course==null){
+            return ResponseEntity.status(404).body(null);
+        }
         service.delete(id);
 
-        return ResponseEntity.ok("Course deleted successfully");
+        return ResponseEntity.ok(course);
     }
 
 }

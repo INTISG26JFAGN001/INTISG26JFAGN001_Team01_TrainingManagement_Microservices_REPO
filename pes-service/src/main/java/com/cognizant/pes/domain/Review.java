@@ -9,16 +9,22 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@Table(name="review")
+@Table(name = "review")
 public class Review {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="project_id")
-    private Long projectId;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "project_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_review_project")
+    )
+    private Project project;
 
-    @Column(name="reviewer_id")
+    @Column(name = "reviewer_id", nullable = false)
     private Long reviewerId;
 
     private double score;

@@ -2,6 +2,7 @@ package com.cognizant.tes.service;
 
 import com.cognizant.tes.dao.IAssociateDAO;
 import com.cognizant.tes.entity.Associate;
+import com.cognizant.tes.exception.InvalidArgumentException;
 import com.cognizant.tes.exception.InvalidAssociateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class AssociateServiceImpl implements IAssociateService {
 
     @Override
     public boolean create(Associate associate) {
+        // call auth-manager to create the user first with the following data and get the userId to store in this associateDAO
         return associateDAO.create(associate);
     }
 
@@ -36,16 +38,25 @@ public class AssociateServiceImpl implements IAssociateService {
 
     @Override
     public Associate getByUserId(long userId) throws InvalidAssociateException {
+        if (userId < 0) {
+            throw new InvalidArgumentException("User ID must be non-negative");
+        }
         return associateDAO.getByUserId(userId);
     }
 
     @Override
     public List<Associate> getByBatchId(long batchId) throws InvalidAssociateException {
+        if (batchId < 0) {
+            throw new InvalidArgumentException("Batch ID must be non-negative");
+        }
         return associateDAO.getByBatchId(batchId);
     }
 
     @Override
     public List<Associate> getByXp(int xp) throws InvalidAssociateException {
+        if (xp < 0) {
+            throw new InvalidArgumentException("XP value must be non-negative");
+        }
         return associateDAO.getByXp(xp);
     }
 
@@ -56,6 +67,9 @@ public class AssociateServiceImpl implements IAssociateService {
 
     @Override
     public boolean deleteById(long id) throws InvalidAssociateException {
+        if (id < 0) {
+            throw new InvalidArgumentException("Associate ID must be non-negative");
+        }
         return associateDAO.deleteById(id);
     }
 }

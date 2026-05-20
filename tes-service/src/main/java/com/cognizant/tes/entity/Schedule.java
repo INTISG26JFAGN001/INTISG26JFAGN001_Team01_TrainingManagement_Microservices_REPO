@@ -14,7 +14,7 @@ public class Schedule {
     @Column(name="schedule_id")
     private Long scheduleId;
 
-    @Column(name="batch_id")
+    @Column(name="batch_id", nullable = false)
     private Long batchId;
 
     @Column(name="session_date")

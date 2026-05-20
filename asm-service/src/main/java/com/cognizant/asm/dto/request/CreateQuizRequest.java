@@ -18,6 +18,8 @@ public class CreateQuizRequest {
     @NotNull(message = "BatchId is required")
     private Long batchId;
 
+    private Long trainerId;
+
     private Long stageId;
 
     @Future(message = "Due date must be in the future")

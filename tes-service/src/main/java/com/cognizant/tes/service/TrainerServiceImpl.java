@@ -6,12 +6,15 @@ import com.cognizant.tes.dao.ITrainerTechnologyDAO;
 import com.cognizant.tes.dto.TechnologyResponseDTO;
 import com.cognizant.tes.entity.Trainer;
 import com.cognizant.tes.entity.TrainerTechnology;
+import com.cognizant.tes.exception.InvalidArgumentException;
+import com.cognizant.tes.exception.InvalidTrainerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -42,10 +45,16 @@ public class TrainerServiceImpl implements ITrainerService {
     }
 
     public Trainer getTrainerById(Long trainerId) {
+        if (trainerId < 0) {
+            throw new InvalidArgumentException("Trainer ID must be non-negative");
+        }
         return trainerDAO.findById(trainerId);
     }
 
     public Trainer deleteTrainer(Long trainerId) {
+        if (trainerId < 0) {
+            throw new InvalidArgumentException("Trainer ID must be non-negative");
+        }
         return trainerDAO.deleteById(trainerId);
     }
 
@@ -54,27 +63,50 @@ public class TrainerServiceImpl implements ITrainerService {
     }
 
     public List<Trainer> getTrainersByTechnologyId(Long technologyId) {
+        if (technologyId < 0) {
+            throw new InvalidArgumentException("Technology ID must be non-negative");
+        }
         return trainerDAO.findTrainersByTechnologyId(technologyId);
     }
 
     @Transactional
     public Trainer updateTrainerTechnologyIds(Long trainerId, List<Long> technologyIds) {
-        Trainer trainer = trainerDAO.findById(trainerId); // validates trainer exists
+        if (trainerId < 0) {
+            throw new InvalidArgumentException("Trainer ID must be non-negative");
+        }
+        Trainer trainer = trainerDAO.findById(trainerId);
 
-        trainerTechnologyDAO.deleteByTrainerId(trainerId);
 
-        List<Long> ids = (technologyIds == null) ? Collections.emptyList() : technologyIds;
-        for (Long techId : ids) {
-            TrainerTechnology mapping = new TrainerTechnology();
-            mapping.setTrainerId(trainerId);
-            mapping.setTechnologyId(techId);
-            trainerTechnologyDAO.save(mapping);
+        List<TrainerTechnology> existingMappings = trainerTechnologyDAO.findByTrainerId(trainerId);
+        List<Long> existingIds = existingMappings.stream()
+                .map(TrainerTechnology::getTechnologyId)
+                .toList();
+
+        List<Long> newIds = (technologyIds == null) ? Collections.emptyList() : technologyIds;
+
+
+        for (Long techId : newIds) {
+            if (!existingIds.contains(techId)) {
+                TrainerTechnology mapping = new TrainerTechnology();
+                mapping.setTrainerId(trainerId);
+                mapping.setTechnologyId(techId);
+                trainerTechnologyDAO.save(mapping);
+            }
         }
 
         return trainer;
     }
 
     public List<TechnologyResponseDTO> getTechnologiesForTrainer(Long trainerId) {
+        if (trainerId < 0) {
+            throw new InvalidArgumentException("Batch ID must be non-negative");
+        }
+
+        Trainer trainerOpt = trainerDAO.findById(trainerId);
+        if (trainerOpt==null) {
+            throw new InvalidTrainerException("Trainer with id=" + trainerId + " not found");
+        }
+
         List<Long> technologyIds = trainerTechnologyDAO.findByTrainerId(trainerId)
                 .stream()
                 .map(TrainerTechnology::getTechnologyId)
