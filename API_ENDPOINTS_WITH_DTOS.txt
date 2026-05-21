@@ -1,0 +1,2209 @@
+================================================================================
+                TRAINING MANAGEMENT MICROSERVICES
+              API ENDPOINTS DOCUMENTATION WITH DTOs
+================================================================================
+Generated Date: May 12, 2026
+Version: 1.0.0
+
+================================================================================
+                           TABLE OF CONTENTS
+================================================================================
+1. Authentication Manager Service (Port: 8080)
+2. Users Management Service (Port: 8080)
+3. Catalog Service - Courses (Port: 8081)
+4. Catalog Service - Technologies (Port: 8081)
+5. Catalog Service - Stages (Port: 8081)
+6. Assessment Service (Port: 8084)
+7. Performance Evaluation Service (Port: 8093)
+8. Training Execution Service (Port: 8082)
+
+================================================================================
+                    1. AUTHENTICATION MANAGER SERVICE
+                              Port: 8080
+                          Base Path: /auth
+================================================================================
+
+----------------------------
+ENDPOINT: /auth/signup
+METHOD: POST
+AUTHORIZATION: ADMIN ONLY
+STATUS CODES: 201 Created, 404 Not Found, 403 Forbidden
+----------------------------
+
+REQUEST DTO: SignupRequestDTO
+----------------------------
+Fields:
+  - username (String) - Required, NotBlank
+      Description: Unique username for the user
+      Example: "john_doe"
+
+  - fullName (String) - Required, NotBlank
+      Description: Complete full name of the user
+      Example: "John Doe"
+
+  - email (String) - Required, NotBlank, Valid Email
+      Description: Valid email address
+      Example: "john@example.com"
+
+  - password (String) - Required, NotBlank
+      Description: User password (will be encrypted)
+      Example: "SecurePassword123!"
+
+  - roles (List<String>) - Optional
+      Description: List of roles to assign to user
+      Example: ["ROLE_ASSOCIATE", "ROLE_TRAINER"]
+      Valid Roles: ROLE_ADMIN, ROLE_TRAINER, ROLE_ASSOCIATE, ROLE_COACH, ROLE_TECH_LEAD, ROLE_SCRUM_LEAD
+
+REQUEST BODY EXAMPLE:
+{
+  "username": "john_doe",
+  "fullName": "John Doe",
+  "email": "john@example.com",
+  "password": "SecurePassword123!",
+  "roles": ["ROLE_ASSOCIATE"]
+}
+
+RESPONSE DTO: SignupResponseDTO
+----------------------------
+Fields:
+  - timestamp (LocalDateTime) - Response timestamp
+      Example: "2024-06-01T12:00:00"
+
+  - signUpSuccess (Boolean) - Success status
+      Example: true
+
+  - message (String) - Response message
+      Example: "Sign up successful. Username: john_doe"
+
+RESPONSE BODY EXAMPLE (Success - 201):
+{
+  "timestamp": "2024-06-01T12:00:00",
+  "signUpSuccess": true,
+  "message": "Sign up successful. Username: john_doe"
+}
+
+RESPONSE BODY EXAMPLE (Error - 404):
+{
+  "timestamp": "2026-04-16T14:00:21",
+  "message": "User with username: john_doe already exists",
+  "errorCode": "U002",
+  "path": "/auth/signup"
+}
+
+----------------------------
+ENDPOINT: /auth/login
+METHOD: POST
+AUTHORIZATION: ALL USERS
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST DTO: LoginRequestDTO
+----------------------------
+Fields:
+  - username (String) - Required, NotBlank
+      Description: User's username or email
+      Example: "john_doe"
+
+  - password (String) - Required, NotBlank
+      Description: User's password
+      Example: "SecurePassword123!"
+
+REQUEST BODY EXAMPLE:
+{
+  "username": "john_doe",
+  "password": "SecurePassword123!"
+}
+
+RESPONSE DTO: LoginResponseDTO
+----------------------------
+Fields:
+  - timestamp (LocalDateTime) - Response timestamp
+      Example: "2026-04-16T14:42:23"
+
+  - message (String) - Welcome message with user full name
+      Example: "Welcome John Doe"
+
+  - loginSuccess (Boolean) - Login status
+      Example: true
+
+  - accessToken (String) - JWT access token
+      Example: "eyJhbGciOiJIUzI1NiJ9.eyJjbGFpbXMiOlsiUk9MRV9BU1NPQ0lBVEUiXS..."
+
+RESPONSE BODY EXAMPLE (Success - 200):
+{
+  "timestamp": "2026-04-16T14:42:23",
+  "message": "Welcome John Doe",
+  "loginSuccess": true,
+  "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJjbGFpbXMiOlsiUk9MRV9BU1NPQ0lBVEUiXSw..."
+}
+
+NOTE: Refresh token is also set as HTTP-only cookie with path /auth/refresh-token
+
+----------------------------
+ENDPOINT: /auth/refresh-token
+METHOD: POST
+AUTHORIZATION: ALL USERS
+STATUS CODES: 202 Accepted, 404 Not Found
+----------------------------
+
+REQUEST:
+  - Cookie: refreshToken=<valid_refresh_token>
+  - Content-Type: application/json
+
+RESPONSE DTO: LoginResponseDTO
+----------------------------
+Same as login response above
+
+RESPONSE BODY EXAMPLE (Success - 202):
+{
+  "timestamp": "2026-04-16T14:57:22",
+  "message": "Access Permitted",
+  "loginSuccess": true,
+  "accessToken": "eyJhbGciOiJIUzI1NiJ9..."
+}
+
+================================================================================
+                    2. USERS MANAGEMENT SERVICE
+                              Port: 8080
+                          Base Path: /user
+================================================================================
+
+----------------------------
+ENDPOINT: /user/all
+METHOD: GET
+AUTHORIZATION: ADMIN ONLY
+STATUS CODES: 200 OK, 403 Forbidden
+----------------------------
+
+REQUEST: No body required
+
+RESPONSE DTO: List<UsersDTO>
+----------------------------
+
+UsersDTO Fields:
+  - id (Long) - User unique identifier
+      Example: 1
+
+  - username (String) - Required, NotBlank
+      Example: "admin@cts.com"
+
+  - fullName (String) - Required, NotBlank
+      Example: "ADMIN CTS"
+
+  - email (String) - Required, NotBlank, Valid Email
+      Example: "admin@cts.com"
+
+  - roles (List<String>) - List of assigned roles
+      Example: ["ROLE_ADMIN"]
+
+RESPONSE BODY EXAMPLE (Success - 200):
+[
+  {
+    "id": 1,
+    "username": "admin@cts.com",
+    "fullName": "ADMIN CTS",
+    "email": "admin@cts.com",
+    "roles": ["ROLE_ADMIN"]
+  },
+  {
+    "id": 2,
+    "username": "trainer@example.com",
+    "fullName": "Trainer CTS",
+    "email": "trainer@example.com",
+    "roles": ["ROLE_TRAINER"]
+  }
+]
+
+----------------------------
+ENDPOINT: /user/{id}
+METHOD: GET
+AUTHORIZATION: ADMIN ONLY
+STATUS CODES: 200 OK, 403 Forbidden, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - User ID to retrieve
+
+RESPONSE DTO: UsersDTO
+----------------------------
+Same as UsersDTO definition above
+
+RESPONSE BODY EXAMPLE (Success - 200):
+{
+  "id": 1,
+  "username": "admin@cts.com",
+  "fullName": "ADMIN CTS",
+  "email": "admin@cts.com",
+  "roles": ["ROLE_ADMIN"]
+}
+
+----------------------------
+ENDPOINT: /user/username
+METHOD: GET
+AUTHORIZATION: everyone
+STATUS CODES: 200 OK, 403 Forbidden, 404 Not Found
+----------------------------
+
+REQUEST QUERY PARAMETERS:
+  - key (String, Query Parameter) - Username to search
+
+RESPONSE DTO: UsersDTO
+
+----------------------------
+ENDPOINT: /user/email
+METHOD: GET
+AUTHORIZATION: ADMIN ONLY
+STATUS CODES: 200 OK, 403 Forbidden, 404 Not Found
+----------------------------
+
+REQUEST QUERY PARAMETERS:
+  - key (String, Query Parameter) - Email to search
+
+RESPONSE DTO: UsersDTO
+
+----------------------------
+ENDPOINT: /user/name
+METHOD: GET
+AUTHORIZATION: ADMIN ONLY
+STATUS CODES: 200 OK, 403 Forbidden
+----------------------------
+
+REQUEST QUERY PARAMETERS:
+  - key (String, Query Parameter) - Full name search (partial matching)
+
+RESPONSE DTO: List<UsersDTO>
+
+RESPONSE BODY EXAMPLE (Success - 200):
+[
+  {
+    "id": 4,
+    "username": "associate@example.com",
+    "fullName": "Associate CTS",
+    "email": "associate@example.com",
+    "roles": ["ROLE_ASSOCIATE"]
+  }
+]
+
+----------------------------
+ENDPOINT: /user/update
+METHOD: PUT
+AUTHORIZATION: ADMIN ONLY
+STATUS CODES: 202 Accepted, 404 Not Found, 403 Forbidden
+----------------------------
+
+REQUEST DTO: UsersDTO
+----------------------------
+Fields (same as UsersDTO):
+  - id (Long) - Required, User ID to update
+  - username (String) - Required
+  - fullName (String) - Required
+  - email (String) - Required, Valid Email
+  - roles (List<String>) - Required
+
+REQUEST BODY EXAMPLE:
+{
+  "id": 2,
+  "username": "trainer_updated@cts.com",
+  "fullName": "Updated Trainer",
+  "email": "trainer_updated@cts.com",
+  "roles": ["ROLE_TRAINER"]
+}
+
+RESPONSE DTO: UsersDTO
+
+RESPONSE BODY EXAMPLE (Success - 202):
+{
+  "id": 2,
+  "username": "trainer_updated@cts.com",
+  "fullName": "Updated Trainer",
+  "email": "trainer_updated@cts.com",
+  "roles": ["ROLE_TRAINER"]
+}
+
+----------------------------
+ENDPOINT: /user/{id}
+METHOD: DELETE
+AUTHORIZATION: ADMIN ONLY
+STATUS CODES: 200 OK, 404 Not Found, 403 Forbidden
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - User ID to delete
+
+RESPONSE DTO: UsersDTO
+
+RESPONSE BODY EXAMPLE (Success - 200):
+{
+  "id": 2,
+  "username": "trainer_updated@cts.com",
+  "fullName": "Updated Trainer",
+  "email": "trainer_updated@cts.com",
+  "roles": ["ROLE_TRAINER"]
+}
+
+================================================================================
+                    3. CATALOG SERVICE - COURSES
+                              Port: 8081
+                        Base Path: /courses
+================================================================================
+
+----------------------------
+ENDPOINT: /courses
+METHOD: POST
+AUTHORIZATION: ADMIN, TECH_LEAD
+STATUS CODES: 201 Created, 400 Bad Request
+----------------------------
+
+REQUEST DTO: CourseRequestDTO
+----------------------------
+Fields:
+  - code (String) - Required, NotBlank
+      Description: Unique course code
+      Example: "JAVA-001"
+
+  - title (String) - Required, NotBlank
+      Description: Course title
+      Example: "Advanced Java Programming"
+
+  - technologyId (Long) - Required, NotNull
+      Description: Reference to Technology
+      Example: 1
+
+  - durationDays (Integer) - Required, NotNull
+      Description: Course duration in days
+      Example: 30
+
+REQUEST BODY EXAMPLE:
+{
+  "code": "JAVA-001",
+  "title": "Advanced Java Programming",
+  "technologyId": 1,
+  "durationDays": 30
+}
+
+RESPONSE DTO: CourseResponseDTO
+----------------------------
+Fields:
+  - id (Long) - Course ID
+  - code (String) - Course code
+  - title (String) - Course title
+  - technologyId (Long) - Technology ID
+  - durationDays (Integer) - Duration in days
+
+RESPONSE BODY EXAMPLE (Success - 201):
+{
+  "id": 1,
+  "code": "JAVA-001",
+  "title": "Advanced Java Programming",
+  "technologyId": 1,
+  "durationDays": 30
+}
+
+----------------------------
+ENDPOINT: /courses
+METHOD: GET
+AUTHORIZATION: ALL ROLES
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST: No body required
+
+RESPONSE DTO: List<CourseResponseDTO>
+
+RESPONSE BODY EXAMPLE (Success - 200):
+[
+  {
+    "id": 1,
+    "code": "JAVA-001",
+    "title": "Advanced Java Programming",
+    "technologyId": 1,
+    "durationDays": 30
+  }
+]
+
+----------------------------
+ENDPOINT: /courses/{id}
+METHOD: GET
+AUTHORIZATION: ALL ROLES
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - Course ID
+
+RESPONSE DTO: CourseResponseDTO
+
+----------------------------
+ENDPOINT: /courses/{id}
+METHOD: PUT
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - Course ID
+
+REQUEST DTO: CourseRequestDTO
+
+REQUEST BODY EXAMPLE:
+{
+  "code": "JAVA-001-UPDATED",
+  "title": "Advanced Java Programming - Updated",
+  "technologyId": 1,
+  "durationDays": 35
+}
+
+RESPONSE DTO: CourseResponseDTO
+
+----------------------------
+ENDPOINT: /courses/{id}
+METHOD: DELETE
+AUTHORIZATION: ADMIN, TECH_LEAD
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - Course ID
+
+RESPONSE BODY EXAMPLE (Success - 200):
+"Course deleted successfully"
+
+================================================================================
+                    4. CATALOG SERVICE - TECHNOLOGIES
+                              Port: 8081
+                      Base Path: /technologies
+================================================================================
+
+----------------------------
+ENDPOINT: /technologies
+METHOD: POST
+AUTHORIZATION: ADMIN, TECH_LEAD
+STATUS CODES: 201 Created, 400 Bad Request
+----------------------------
+
+REQUEST DTO: TechnologyRequestDTO
+----------------------------
+Fields:
+  - name (String) - Required, NotBlank
+      Description: Technology name
+      Example: "Java"
+
+  - description (String) - Optional
+      Description: Technology description
+      Example: "Java Programming Language"
+
+REQUEST BODY EXAMPLE:
+{
+  "name": "Java",
+  "description": "Java Programming Language"
+}
+
+RESPONSE DTO: TechnologyResponseDTO
+----------------------------
+Fields:
+  - id (Long) - Technology ID
+  - name (String) - Technology name
+  - description (String) - Technology description
+
+RESPONSE BODY EXAMPLE (Success - 201):
+{
+  "id": 1,
+  "name": "Java",
+  "description": "Java Programming Language"
+}
+
+----------------------------
+ENDPOINT: /technologies
+METHOD: GET
+AUTHORIZATION: ALL ROLES
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST: No body required
+
+RESPONSE DTO: List<TechnologyResponseDTO>
+
+----------------------------
+ENDPOINT: /technologies/{id}
+METHOD: GET
+AUTHORIZATION: ALL ROLES
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - Technology ID
+
+RESPONSE DTO: TechnologyResponseDTO
+
+----------------------------
+ENDPOINT: /technologies/{id}
+METHOD: PUT
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST DTO: TechnologyRequestDTO
+
+----------------------------
+ENDPOINT: /technologies/{id}
+METHOD: DELETE
+AUTHORIZATION: ADMIN, TECH_LEAD
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+RESPONSE BODY EXAMPLE (Success - 200):
+"Technology deleted successfully"
+
+================================================================================
+                    5. CATALOG SERVICE - STAGES
+                              Port: 8081
+                        Base Path: /stages
+================================================================================
+
+----------------------------
+ENDPOINT: /stages
+METHOD: POST
+AUTHORIZATION: ADMIN, TECH_LEAD
+STATUS CODES: 201 Created, 400 Bad Request
+----------------------------
+
+REQUEST DTO: StageRequestDTO
+----------------------------
+Fields:
+  - name (String) - Required, NotBlank
+      Description: Stage name
+      Example: "Fundamentals"
+
+  - description (String) - Optional
+      Description: Stage description
+      Example: "Introduction to concepts"
+
+  - order (Integer) - Optional
+      Description: Order/sequence of stage
+      Example: 1
+
+REQUEST BODY EXAMPLE:
+{
+  "name": "Fundamentals",
+  "description": "Introduction to concepts",
+  "order": 1
+}
+
+RESPONSE DTO: StageResponseDTO
+----------------------------
+Fields:
+  - id (Long) - Stage ID
+  - name (String) - Stage name
+  - description (String) - Stage description
+  - order (Integer) - Stage order
+
+----------------------------
+ENDPOINT: /stages
+METHOD: GET
+AUTHORIZATION: ALL ROLES
+STATUS CODES: 200 OK
+----------------------------
+
+RESPONSE DTO: List<StageResponseDTO>
+
+----------------------------
+ENDPOINT: /stages/{id}
+METHOD: GET
+AUTHORIZATION: ALL ROLES
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - Stage ID
+
+RESPONSE DTO: StageResponseDTO
+
+----------------------------
+ENDPOINT: /stages/{id}
+METHOD: PUT
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST DTO: StageRequestDTO
+
+----------------------------
+ENDPOINT: /stages/{id}
+METHOD: DELETE
+AUTHORIZATION: ADMIN, TECH_LEAD
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+RESPONSE BODY EXAMPLE (Success - 200):
+"Stage deleted successfully"
+
+================================================================================
+                    6. ASSESSMENT SERVICE
+                              Port: 8084
+                      Base Path: /assessments
+================================================================================
+
+----------------------------
+ENDPOINT: /assessments
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, ASSOCIATE
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST: No body required
+
+RESPONSE DTO: List<AssessmentSummaryResponse>
+----------------------------
+Fields:
+  - id (Long) - Assessment ID
+  - batchId (Long) - Batch ID
+  - type (Enum) - Assessment type: QUIZ, INTERVIEW
+  - status (Enum) - Assessment status: DRAFT, PUBLISHED, CLOSED
+  - title (String) - Assessment title
+  - createdAt (LocalDateTime) - Creation timestamp
+
+RESPONSE BODY EXAMPLE (Success - 200):
+[
+  {
+    "id": 1,
+    "batchId": 101,
+    "type": "QUIZ",
+    "status": "PUBLISHED",
+    "title": "Java Fundamentals Quiz",
+    "createdAt": "2026-04-16T10:00:00"
+  }
+]
+
+----------------------------
+ENDPOINT: /assessments/batch/{batchId}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, ASSOCIATE
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST PARAMETERS:
+  - batchId (Long, Path Parameter) - Batch ID
+
+RESPONSE DTO: List<AssessmentSummaryResponse>
+
+----------------------------
+ENDPOINT: /assessments/type/{type}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, ASSOCIATE
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST PARAMETERS:
+  - type (Enum, Path Parameter) - Assessment type: QUIZ, INTERVIEW
+
+RESPONSE DTO: List<AssessmentSummaryResponse>
+
+----------------------------
+ENDPOINT: /assessments/status/{status}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST PARAMETERS:
+  - status (Enum, Path Parameter) - Assessment status: DRAFT, PUBLISHED, CLOSED
+
+RESPONSE DTO: List<AssessmentSummaryResponse>
+
+----------------------------
+ENDPOINT: /assessments/quiz
+METHOD: POST
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD
+STATUS CODES: 201 Created, 400 Bad Request
+----------------------------
+
+REQUEST HEADERS:
+  - X-User-Id (Long, Optional) - Creator user ID (defaults to 0)
+
+REQUEST DTO: CreateQuizRequest
+----------------------------
+Fields:
+  - title (String) - Required, NotBlank
+      Description: Quiz title
+      Example: "Java Fundamentals Quiz"
+
+  - batchId (Long) - Required, NotNull
+      Description: Associated batch ID
+      Example: 101
+
+  - questions (List<QuizQuestionRequest>) - Required
+      Description: List of quiz questions
+
+QuizQuestionRequest Fields:
+  - text (String) - Required, NotBlank
+      Description: Question text
+      Example: "What is polymorphism?"
+
+  - options (List<String>) - Required
+      Description: Multiple choice options
+      Example: ["Option 1", "Option 2", "Option 3"]
+
+  - correctOption (Integer) - Required
+      Description: Index of correct option (0-based)
+      Example: 0
+
+REQUEST BODY EXAMPLE:
+{
+  "title": "Java Fundamentals Quiz",
+  "batchId": 101,
+  "questions": [
+    {
+      "text": "What is polymorphism?",
+      "options": ["Overloading", "Overriding", "Inheritance"],
+      "correctOption": 1
+    },
+    {
+      "text": "What is encapsulation?",
+      "options": ["Hiding data", "Exposing data", "Copying data"],
+      "correctOption": 0
+    }
+  ]
+}
+
+RESPONSE DTO: QuizDetailResponse
+----------------------------
+Fields:
+  - id (Long) - Quiz ID
+  - title (String) - Quiz title
+  - batchId (Long) - Batch ID
+  - status (String) - Status: DRAFT, PUBLISHED, CLOSED
+  - questionCount (Integer) - Number of questions
+  - createdAt (LocalDateTime) - Creation timestamp
+
+RESPONSE BODY EXAMPLE (Success - 201):
+{
+  "id": 1,
+  "title": "Java Fundamentals Quiz",
+  "batchId": 101,
+  "status": "DRAFT",
+  "questionCount": 2,
+  "createdAt": "2026-04-16T10:00:00"
+}
+
+----------------------------
+ENDPOINT: /assessments/quiz/{quizId}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, ASSOCIATE
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - quizId (Long, Path Parameter) - Quiz ID
+
+RESPONSE DTO: QuizDetailResponse
+
+----------------------------
+ENDPOINT: /assessments/quiz/{quizId}/attempt
+METHOD: POST
+AUTHORIZATION: ASSOCIATE
+STATUS CODES: 201 Created, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - quizId (Long, Path Parameter) - Quiz ID
+
+REQUEST DTO: QuizAttemptRequest
+----------------------------
+Fields:
+  - associateId (Long) - Required, NotNull
+      Description: Associate attempting the quiz
+      Example: 301
+
+  - answers (List<Integer>) - Required
+      Description: List of answer indices selected
+      Example: [0, 1, 0, 2]
+
+REQUEST BODY EXAMPLE:
+{
+  "associateId": 301,
+  "answers": [0, 1, 0, 2]
+}
+
+RESPONSE DTO: QuizAttemptResultResponse
+----------------------------
+Fields:
+  - quizId (Long) - Quiz ID
+  - associateId (Long) - Associate ID
+  - score (Integer) - Score obtained (0-100)
+  - totalQuestions (Integer) - Total questions in quiz
+  - correctAnswers (Integer) - Number of correct answers
+  - result (Enum) - PASS or FAIL
+  - attemptedAt (LocalDateTime) - Attempt timestamp
+
+RESPONSE BODY EXAMPLE (Success - 201):
+{
+  "quizId": 1,
+  "associateId": 301,
+  "score": 80,
+  "totalQuestions": 2,
+  "correctAnswers": 2,
+  "result": "PASS",
+  "attemptedAt": "2026-04-16T11:00:00"
+}
+
+----------------------------
+ENDPOINT: /assessments/quiz/{quizId}/attempts/{associateId}/result
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, ASSOCIATE
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - quizId (Long, Path Parameter) - Quiz ID
+  - associateId (Long, Path Parameter) - Associate ID
+
+RESPONSE DTO: QuizAttemptResultResponse
+
+----------------------------
+ENDPOINT: /assessments/quiz/{quizId}/attempts
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - quizId (Long, Path Parameter) - Quiz ID
+
+RESPONSE DTO: List<QuizAttemptResultResponse>
+
+----------------------------
+ENDPOINT: /assessments/interview
+METHOD: POST
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD
+STATUS CODES: 201 Created, 400 Bad Request
+----------------------------
+
+REQUEST HEADERS:
+  - X-User-Id (Long, Optional) - Creator user ID
+
+REQUEST DTO: CreateInterviewRequest
+----------------------------
+Fields:
+  - title (String) - Required, NotBlank
+      Description: Interview title
+      Example: "Technical Interview Round 1"
+
+  - batchId (Long) - Required, NotNull
+      Description: Associated batch ID
+      Example: 101
+
+  - category (Enum) - Required
+      Description: Interview category
+      Values: TECHNICAL, HR, BEHAVIOURAL
+      Example: "TECHNICAL"
+
+  - panelists (List<Long>) - Optional
+      Description: Panel member user IDs
+      Example: [9001, 9002]
+
+REQUEST BODY EXAMPLE:
+{
+  "title": "Technical Interview Round 1",
+  "batchId": 101,
+  "category": "TECHNICAL",
+  "panelists": [9001, 9002]
+}
+
+RESPONSE DTO: InterviewDetailResponse
+----------------------------
+Fields:
+  - id (Long) - Interview ID
+  - title (String) - Interview title
+  - batchId (Long) - Batch ID
+  - category (String) - Interview category
+  - status (String) - Status: DRAFT, PUBLISHED, CLOSED
+  - panelistCount (Integer) - Number of panelists
+  - createdAt (LocalDateTime) - Creation timestamp
+
+RESPONSE BODY EXAMPLE (Success - 201):
+{
+  "id": 1,
+  "title": "Technical Interview Round 1",
+  "batchId": 101,
+  "category": "TECHNICAL",
+  "status": "DRAFT",
+  "panelistCount": 2,
+  "createdAt": "2026-04-16T10:00:00"
+}
+
+----------------------------
+ENDPOINT: /assessments/interview/{interviewId}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, ASSOCIATE
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - interviewId (Long, Path Parameter) - Interview ID
+
+RESPONSE DTO: InterviewDetailResponse
+
+----------------------------
+ENDPOINT: /assessments/interview/batch/{batchId}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, ASSOCIATE
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST PARAMETERS:
+  - batchId (Long, Path Parameter) - Batch ID
+
+RESPONSE DTO: List<AssessmentSummaryResponse>
+
+----------------------------
+ENDPOINT: /assessments/interview/{interviewId}/publish
+METHOD: POST
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - interviewId (Long, Path Parameter) - Interview ID
+
+RESPONSE DTO: InterviewDetailResponse
+
+----------------------------
+ENDPOINT: /assessments/{assessmentId}/rubrics
+METHOD: POST
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD
+STATUS CODES: 201 Created, 400 Bad Request
+----------------------------
+
+REQUEST PARAMETERS:
+  - assessmentId (Long, Path Parameter) - Assessment ID
+
+REQUEST DTO: CreateRubricRequest
+----------------------------
+Fields:
+  - criterion (String) - Required, NotBlank
+      Description: Evaluation criterion name
+      Example: "Communication Skills"
+
+  - weight (Integer) - Required, NotNull
+      Description: Weight percentage (0-100)
+      Example: 25
+
+  - maxScore (Integer) - Optional
+      Description: Maximum score for this criterion
+      Example: 100
+
+  - description (String) - Optional
+      Description: Criterion description
+
+REQUEST BODY EXAMPLE:
+{
+  "criterion": "Communication Skills",
+  "weight": 25,
+  "maxScore": 100,
+  "description": "Ability to communicate clearly"
+}
+
+RESPONSE DTO: RubricResponse
+----------------------------
+Fields:
+  - id (Long) - Rubric ID
+  - assessmentId (Long) - Assessment ID
+  - criterion (String) - Criterion name
+  - weight (Integer) - Weight percentage
+  - maxScore (Integer) - Maximum score
+
+RESPONSE BODY EXAMPLE (Success - 201):
+{
+  "id": 1,
+  "assessmentId": 1,
+  "criterion": "Communication Skills",
+  "weight": 25,
+  "maxScore": 100
+}
+
+----------------------------
+ENDPOINT: /assessments/{assessmentId}/rubrics
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, ASSOCIATE
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST PARAMETERS:
+  - assessmentId (Long, Path Parameter) - Assessment ID
+
+RESPONSE DTO: List<RubricResponse>
+
+----------------------------
+ENDPOINT: /assessments/{assessmentId}/rubrics/total-weight
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST PARAMETERS:
+  - assessmentId (Long, Path Parameter) - Assessment ID
+
+RESPONSE BODY EXAMPLE (Success - 200):
+100
+
+================================================================================
+                    7. PERFORMANCE EVALUATION SERVICE
+                              Port: 8093
+                  Base Paths: /evaluations, /projects, /reviews, /interview-evaluations
+================================================================================
+
+----------------------------
+ENDPOINT: /evaluations/submitEvaluation
+METHOD: POST
+AUTHORIZATION: TRAINER, TECH_LEAD
+STATUS CODES: 200 OK, 400 Bad Request, 404 Not Found
+----------------------------
+
+REQUEST DTO: EvaluationRequestDTO
+----------------------------
+Fields:
+  - batchId (Long) - Required, NotNull
+      Description: Batch ID for evaluation
+      Example: 101
+
+  - associateId (Long) - Required, NotNull
+      Description: Associate being evaluated
+      Example: 301
+
+  - interimScore (Integer) - Required, NotNull, Range(0-100)
+      Description: Interim performance score
+      Example: 75
+
+  - finalScore (Integer) - Required, NotNull, Range(0-100)
+      Description: Final performance score
+      Example: 82
+
+  - overallStatus (Enum) - Required
+      Description: Overall status
+      Values: PASS, FAIL
+      Example: "PASS"
+
+REQUEST BODY EXAMPLE:
+{
+  "batchId": 101,
+  "associateId": 301,
+  "interimScore": 75,
+  "finalScore": 82,
+  "overallStatus": "PASS"
+}
+
+RESPONSE DTO: EvaluationResponseDTO
+----------------------------
+Fields:
+  - batchId (Long) - Batch ID
+  - associateId (Long) - Associate ID
+  - interimScore (Integer) - Interim score
+  - finalScore (Integer) - Final score
+  - overallStatus (String) - Overall status
+  - evaluatedAt (LocalDateTime) - Evaluation timestamp
+
+RESPONSE BODY EXAMPLE (Success - 200):
+{
+  "batchId": 101,
+  "associateId": 301,
+  "interimScore": 75,
+  "finalScore": 82,
+  "overallStatus": "PASS",
+  "evaluatedAt": "2026-04-16T15:00:00"
+}
+
+----------------------------
+ENDPOINT: /evaluations/batch/{batchId}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - batchId (Long, Path Parameter) - Batch ID
+
+RESPONSE DTO: List<EvaluationResponseDTO>
+
+----------------------------
+ENDPOINT: /evaluations/batch/{batchId}/associate/{associateId}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, ASSOCIATE
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - batchId (Long, Path Parameter) - Batch ID
+  - associateId (Long, Path Parameter) - Associate ID
+
+RESPONSE DTO: EvaluationResponseDTO
+
+----------------------------
+ENDPOINT: /evaluations/batch/{batchId}/calculate
+METHOD: POST
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD
+STATUS CODES: 202 Accepted, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - batchId (Long, Path Parameter) - Batch ID
+
+RESPONSE: Accepted (Async operation)
+
+----------------------------
+ENDPOINT: /projects/submitProject
+METHOD: POST
+AUTHORIZATION: ALL ROLES
+STATUS CODES: 201 Created, 400 Bad Request
+----------------------------
+
+REQUEST DTO: ProjectRequestDTO
+----------------------------
+Fields:
+  - title (String) - Required, NotBlank
+      Description: Project title
+      Example: "Employee Management System"
+
+  - batchId (Long) - Required, NotNull
+      Description: Associated batch ID
+      Example: 25
+
+  - repoUrl (String) - Required, NotBlank, Valid URL
+      Description: Repository URL (GitHub, GitLab, etc.)
+      Example: "https://github.com/org/ems-project"
+
+  - description (String) - Optional
+      Description: Project description
+
+REQUEST BODY EXAMPLE:
+{
+  "title": "Employee Management System",
+  "batchId": 25,
+  "repoUrl": "https://github.com/org/ems-project",
+  "description": "Full-stack employee management application"
+}
+
+RESPONSE DTO: ProjectResponseDTO
+----------------------------
+Fields:
+  - id (Long) - Project ID
+  - title (String) - Project title
+  - batchId (Long) - Batch ID
+  - repoUrl (String) - Repository URL
+  - description (String) - Project description
+  - submittedAt (LocalDateTime) - Submission timestamp
+
+RESPONSE BODY EXAMPLE (Success - 201):
+{
+  "id": 201,
+  "title": "Employee Management System",
+  "batchId": 25,
+  "repoUrl": "https://github.com/org/ems-project",
+  "description": "Full-stack employee management application",
+  "submittedAt": "2026-04-16T10:10:00"
+}
+
+----------------------------
+ENDPOINT: /projects/{projectId}
+METHOD: GET
+AUTHORIZATION: ALL ROLES
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - projectId (Long, Path Parameter) - Project ID
+
+RESPONSE DTO: ProjectResponseDTO
+
+----------------------------
+ENDPOINT: /projects/getProjects
+METHOD: GET
+AUTHORIZATION: ALL ROLES
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST: No body required
+
+RESPONSE DTO: List<ProjectResponseDTO>
+
+----------------------------
+ENDPOINT: /projects/update/{projectId}
+METHOD: PUT
+AUTHORIZATION: ALL ROLES
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - projectId (Long, Path Parameter) - Project ID
+
+REQUEST DTO: ProjectRequestDTO
+
+RESPONSE DTO: ProjectResponseDTO
+
+----------------------------
+ENDPOINT: /projects/delete/{projectId}
+METHOD: DELETE
+AUTHORIZATION: ALL ROLES
+STATUS CODES: 204 No Content, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - projectId (Long, Path Parameter) - Project ID
+
+----------------------------
+ENDPOINT: /reviews/project/{projectId}
+METHOD: POST
+AUTHORIZATION: SCRUM_LEAD, TECH_LEAD
+STATUS CODES: 201 Created, 400 Bad Request, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - projectId (Long, Path Parameter) - Project ID
+
+REQUEST DTO: ReviewRequestDTO
+----------------------------
+Fields:
+  - reviewerId (Long) - Required, NotNull
+      Description: ID of the reviewer
+      Example: 9001
+
+  - score (Integer) - Required, NotNull, Range(0-100)
+      Description: Review score
+      Example: 85
+
+  - comments (String) - Optional
+      Description: Review comments
+      Example: "Well-structured code and clean architecture"
+
+  - type (Enum) - Required
+      Description: Review type
+      Values: TECH, SCRUM
+      Example: "TECH"
+
+REQUEST BODY EXAMPLE:
+{
+  "reviewerId": 9001,
+  "score": 85,
+  "comments": "Well-structured code and clean architecture",
+  "type": "TECH"
+}
+
+RESPONSE DTO: ReviewResponseDTO
+----------------------------
+Fields:
+  - id (Long) - Review ID
+  - projectId (Long) - Project ID
+  - reviewerId (Long) - Reviewer ID
+  - score (Integer) - Score (0-100)
+  - comments (String) - Comments
+  - type (String) - Review type (TECH/SCRUM)
+  - reviewedAt (LocalDateTime) - Review timestamp
+
+RESPONSE BODY EXAMPLE (Success - 201):
+{
+  "id": 501,
+  "projectId": 201,
+  "reviewerId": 9001,
+  "score": 85,
+  "comments": "Well-structured code and clean architecture",
+  "type": "TECH",
+  "reviewedAt": "2026-04-17T10:40:00"
+}
+
+----------------------------
+ENDPOINT: /reviews/{reviewId}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, SCRUM_LEAD
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - reviewId (Long, Path Parameter) - Review ID
+
+RESPONSE DTO: ReviewResponseDTO
+
+----------------------------
+ENDPOINT: /reviews/{reviewId}
+METHOD: PUT
+AUTHORIZATION: SCRUM_LEAD, TECH_LEAD
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - reviewId (Long, Path Parameter) - Review ID
+
+REQUEST DTO: ReviewRequestDTO
+
+RESPONSE DTO: ReviewResponseDTO
+
+----------------------------
+ENDPOINT: /reviews/{reviewId}
+METHOD: DELETE
+AUTHORIZATION: ADMIN
+STATUS CODES: 204 No Content, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - reviewId (Long, Path Parameter) - Review ID
+
+----------------------------
+ENDPOINT: /reviews/project/{projectId}/all
+METHOD: GET
+AUTHORIZATION: ALL ROLES
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - projectId (Long, Path Parameter) - Project ID
+
+RESPONSE DTO: List<ReviewResponseDTO>
+
+RESPONSE BODY EXAMPLE (Success - 200):
+[
+  {
+    "id": 501,
+    "projectId": 201,
+    "reviewerId": 9001,
+    "score": 85,
+    "type": "TECH"
+  },
+  {
+    "id": 502,
+    "projectId": 201,
+    "reviewerId": 9002,
+    "score": 80,
+    "type": "SCRUM"
+  }
+]
+
+----------------------------
+ENDPOINT: /interview-evaluations
+METHOD: POST
+AUTHORIZATION: TRAINER
+STATUS CODES: 201 Created, 400 Bad Request, 404 Not Found
+----------------------------
+
+REQUEST DTO: InterviewEvaluationRequestDTO
+----------------------------
+Fields:
+  - assessmentId (Long) - Required, NotNull
+      Description: Interview assessment ID
+      Example: 1001
+
+  - associateId (Long) - Required, NotNull
+      Description: Associate being evaluated
+      Example: 301
+
+  - evaluatorId (Long) - Required, NotNull
+      Description: Evaluator user ID
+      Example: 9001
+
+  - evaluatorRole (String) - Required, NotBlank
+      Description: Role of evaluator
+      Example: "PANELIST"
+
+  - rubricScores (Map<Long, Integer>) - Required
+      Description: Map of rubric ID to score
+      Example: {"1": 80, "2": 85, "3": 90}
+
+REQUEST BODY EXAMPLE:
+{
+  "assessmentId": 1001,
+  "associateId": 301,
+  "evaluatorId": 9001,
+  "evaluatorRole": "PANELIST",
+  "rubricScores": {
+    "1": 80,
+    "2": 85,
+    "3": 90
+  }
+}
+
+RESPONSE DTO: InterviewEvaluationResponseDTO
+----------------------------
+Fields:
+  - id (Long) - Evaluation ID
+  - assessmentId (Long) - Assessment ID
+  - associateId (Long) - Associate ID
+  - evaluatorId (Long) - Evaluator ID
+  - evaluatorRole (String) - Evaluator role
+  - totalScore (Integer) - Total calculated score
+  - maxScore (Integer) - Maximum possible score
+  - resultStatus (String) - Result status (PASS/FAIL)
+  - evaluatedAt (LocalDateTime) - Evaluation timestamp
+
+RESPONSE BODY EXAMPLE (Success - 201):
+{
+  "id": 501,
+  "assessmentId": 1001,
+  "associateId": 301,
+  "evaluatorId": 9001,
+  "evaluatorRole": "PANELIST",
+  "totalScore": 85,
+  "maxScore": 100,
+  "resultStatus": "PASS",
+  "evaluatedAt": "2026-04-17T10:15:00"
+}
+
+----------------------------
+ENDPOINT: /interview-evaluations/assessment/{assessmentId}/associate/{associateId}
+METHOD: GET
+AUTHORIZATION: TRAINER, ASSOCIATE
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - assessmentId (Long, Path Parameter) - Assessment ID
+  - associateId (Long, Path Parameter) - Associate ID
+
+RESPONSE DTO: InterviewEvaluationResponseDTO
+
+----------------------------
+ENDPOINT: /interview-evaluations/assessment/{assessmentId}
+METHOD: GET
+AUTHORIZATION: TRAINER
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - assessmentId (Long, Path Parameter) - Assessment ID
+
+RESPONSE DTO: List<InterviewEvaluationResponseDTO>
+
+----------------------------
+ENDPOINT: /interview-evaluations/associate/{associateId}
+METHOD: GET
+AUTHORIZATION: TRAINER, ASSOCIATE
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - associateId (Long, Path Parameter) - Associate ID
+
+RESPONSE DTO: List<InterviewEvaluationResponseDTO>
+
+================================================================================
+                    8. TRAINING EXECUTION SERVICE
+                              Port: 8082
+            Base Paths: /batches, /associates, /trainer, /schedule, /enrollment
+================================================================================
+
+----------------------------
+ENDPOINT: /batches
+METHOD: POST
+AUTHORIZATION: ADMIN
+STATUS CODES: 201 Created, 400 Bad Request
+----------------------------
+
+REQUEST DTO: BatchDetailsDTO
+----------------------------
+Fields:
+  - trainerId (Long) - Required, NotNull
+      Description: Trainer user ID
+      Example: 5001
+
+  - courseIds (List<Long>) - Required
+      Description: List of course IDs
+      Example: [1, 2, 3]
+
+  - startDate (LocalDate) - Optional
+      Description: Batch start date
+      Example: "2026-05-01"
+
+  - endDate (LocalDate) - Optional
+      Description: Batch end date
+      Example: "2026-08-01"
+
+  - status (Enum) - Optional
+      Description: Batch status
+      Values: ACTIVE, INACTIVE
+      Example: "ACTIVE"
+
+REQUEST BODY EXAMPLE:
+{
+  "trainerId": 5001,
+  "courseIds": [1, 2, 3],
+  "startDate": "2026-05-01",
+  "endDate": "2026-08-01",
+  "status": "ACTIVE"
+}
+
+RESPONSE DTO: BatchDetailsDTO
+----------------------------
+Fields:
+  - id (Long) - Batch ID
+  - trainerId (Long) - Trainer ID
+  - courseNames (List<String>) - Course names
+  - courseIds (List<Long>) - Course IDs
+  - status (String) - Batch status
+
+RESPONSE BODY EXAMPLE (Success - 201):
+{
+  "id": 101,
+  "trainerId": 5001,
+  "courseNames": ["Java", "Spring Boot", "Microservices"],
+  "courseIds": [1, 2, 3],
+  "status": "ACTIVE"
+}
+
+----------------------------
+ENDPOINT: /batches
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST: No body required
+
+RESPONSE DTO: List<BatchDTO>
+----------------------------
+
+BatchDTO Fields:
+  - id (Long) - Batch ID
+  - trainerId (Long) - Trainer ID
+  - courseNames (List<String>) - Course names
+  - status (String) - Batch status
+
+RESPONSE BODY EXAMPLE (Success - 200):
+[
+  {
+    "id": 101,
+    "trainerId": 5001,
+    "courseNames": ["Java"],
+    "status": "ACTIVE"
+  }
+]
+
+----------------------------
+ENDPOINT: /batches/{id}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - Batch ID
+
+RESPONSE DTO: BatchDTO
+
+----------------------------
+ENDPOINT: /batches/{id}
+METHOD: DELETE
+AUTHORIZATION: ADMIN
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - Batch ID
+
+RESPONSE DTO: BatchDTO
+
+----------------------------
+ENDPOINT: /batches/{id}/status
+METHOD: PUT
+AUTHORIZATION: ADMIN, TRAINER
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - Batch ID
+  - status (Enum, Query Parameter) - New status: ACTIVE, INACTIVE
+
+RESPONSE DTO: BatchDTO
+
+----------------------------
+ENDPOINT: /batches/status
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST QUERY PARAMETERS:
+  - status (Enum, Query Parameter) - Filter status: ACTIVE, INACTIVE
+
+RESPONSE DTO: List<BatchDTO>
+
+----------------------------
+ENDPOINT: /batches/course
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST QUERY PARAMETERS:
+  - course_id (Long, Query Parameter) - Course ID to filter
+
+RESPONSE DTO: List<BatchDTO>
+
+----------------------------
+ENDPOINT: /batches/trainer
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST QUERY PARAMETERS:
+  - trainer_id (Long, Query Parameter) - Trainer ID to filter
+
+RESPONSE DTO: List<BatchDTO>
+
+----------------------------
+ENDPOINT: /batches/{id}/details
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - Batch ID
+
+RESPONSE DTO: BatchDetailsDTO
+
+----------------------------
+ENDPOINT: /batches/{batchId}/courses
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH, ASSOCIATE
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - batchId (Long, Path Parameter) - Batch ID
+
+RESPONSE DTO: List<CourseResponseDTO>
+
+----------------------------
+ENDPOINT: /associates/{userId}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH, ASSOCIATE
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - userId (Long, Path Parameter) - User ID
+
+RESPONSE DTO: AssociateDTO
+----------------------------
+
+AssociateDTO Fields:
+  - id (Long) - Associate ID
+  - userId (Long) - User ID
+  - batchId (Long) - Batch ID
+  - xpPoints (Integer) - Experience points
+  - joinedAt (LocalDateTime) - Join timestamp
+
+RESPONSE BODY EXAMPLE (Success - 200):
+{
+  "id": 301,
+  "userId": 4,
+  "batchId": 101,
+  "xpPoints": 150,
+  "joinedAt": "2026-04-01T09:00:00"
+}
+
+----------------------------
+ENDPOINT: /associates
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH, ASSOCIATE
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST: No body required
+
+RESPONSE DTO: List<AssociateDTO>
+
+----------------------------
+ENDPOINT: /associates/batch
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH, ASSOCIATE
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST QUERY PARAMETERS:
+  - id (Long, Query Parameter) - Batch ID
+
+RESPONSE DTO: List<AssociateDTO>
+
+----------------------------
+ENDPOINT: /associates/xp
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH, ASSOCIATE
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST QUERY PARAMETERS:
+  - value (Integer, Query Parameter) - Minimum XP points to filter
+
+RESPONSE DTO: List<AssociateDTO>
+
+----------------------------
+ENDPOINT: /associates/create
+METHOD: POST
+AUTHORIZATION: ADMIN
+STATUS CODES: 200 OK, 400 Bad Request, 500 Internal Server Error
+----------------------------
+
+REQUEST DTO: CreateAssociateDTO
+----------------------------
+Fields:
+  - userId (Long) - Required, NotNull
+      Description: User ID
+      Example: 4
+
+  - batchId (Long) - Required, NotNull
+      Description: Batch ID to enroll
+      Example: 101
+
+  - xpPoints (Integer) - Optional
+      Description: Initial XP points
+      Example: 100
+
+REQUEST BODY EXAMPLE:
+{
+  "userId": 4,
+  "batchId": 101,
+  "xpPoints": 100
+}
+
+RESPONSE BODY EXAMPLE (Success - 200):
+"Associate created successfully"
+
+----------------------------
+ENDPOINT: /associates/update
+METHOD: PUT
+AUTHORIZATION: ADMIN
+STATUS CODES: 200 OK, 400 Bad Request
+----------------------------
+
+REQUEST DTO: AssociateDTO
+
+REQUEST BODY EXAMPLE:
+{
+  "id": 301,
+  "userId": 4,
+  "batchId": 101,
+  "xpPoints": 200
+}
+
+RESPONSE BODY EXAMPLE (Success - 200):
+"Associate updated successfully"
+
+----------------------------
+ENDPOINT: /trainer
+METHOD: POST
+AUTHORIZATION: ADMIN
+STATUS CODES: 200 OK, 400 Bad Request
+----------------------------
+
+REQUEST DTO: TrainerDTO
+----------------------------
+Fields:
+  - userId (Long) - Required, NotNull
+      Description: User ID
+      Example: 5
+
+  - specialization (String) - Optional
+      Description: Trainer specialization
+      Example: "Java & Spring Boot"
+
+  - technologyIds (List<Long>) - Optional
+      Description: Technology expertise IDs
+      Example: [1, 2, 3]
+
+REQUEST BODY EXAMPLE:
+{
+  "userId": 5,
+  "specialization": "Java & Spring Boot",
+  "technologyIds": [1, 2, 3]
+}
+
+RESPONSE DTO: TrainerDTO
+----------------------------
+Fields:
+  - id (Long) - Trainer ID
+  - userId (Long) - User ID
+  - specialization (String) - Specialization
+  - technologyIds (List<Long>) - Technology IDs
+  - technologyNames (List<String>) - Technology names
+
+RESPONSE BODY EXAMPLE (Success - 200):
+{
+  "id": 5001,
+  "userId": 5,
+  "specialization": "Java & Spring Boot",
+  "technologyIds": [1, 2, 3],
+  "technologyNames": ["Java", "Spring Boot", "Microservices"]
+}
+
+----------------------------
+ENDPOINT: /trainer/{trainerId}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH, ASSOCIATE
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - trainerId (Long, Path Parameter) - Trainer ID
+
+RESPONSE DTO: TrainerDTO
+
+----------------------------
+ENDPOINT: /trainer
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST: No body required
+
+RESPONSE DTO: List<TrainerDTO>
+
+----------------------------
+ENDPOINT: /trainer/{trainerId}
+METHOD: DELETE
+AUTHORIZATION: ADMIN
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - trainerId (Long, Path Parameter) - Trainer ID
+
+RESPONSE DTO: TrainerDTO
+
+----------------------------
+ENDPOINT: /trainer/technology
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST QUERY PARAMETERS:
+  - technologyId (Long, Query Parameter) - Technology ID to filter
+
+RESPONSE DTO: List<TrainerDTO>
+
+----------------------------
+ENDPOINT: /trainer/{trainerId}/technologies
+METHOD: PUT
+AUTHORIZATION: ADMIN
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - trainerId (Long, Path Parameter) - Trainer ID
+
+REQUEST BODY: List<Long>
+Description: List of technology IDs
+
+REQUEST BODY EXAMPLE:
+[1, 2, 3, 4]
+
+RESPONSE DTO: TrainerDTO
+
+----------------------------
+ENDPOINT: /trainer/{trainerId}/technologies
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - trainerId (Long, Path Parameter) - Trainer ID
+
+RESPONSE DTO: List<TechnologyResponseDTO>
+
+----------------------------
+ENDPOINT: /schedule
+METHOD: POST
+AUTHORIZATION: ADMIN
+STATUS CODES: 200 OK, 400 Bad Request
+----------------------------
+
+REQUEST DTO: ScheduleDTO
+----------------------------
+Fields:
+  - batchId (Long) - Required, NotNull
+      Description: Batch ID
+      Example: 101
+
+  - sessionDate (LocalDateTime) - Required, NotNull
+      Description: Session date and time
+      Example: "2026-05-15T09:00:00"
+
+  - duration (Integer) - Optional
+      Description: Duration in minutes
+      Example: 60
+
+REQUEST BODY EXAMPLE:
+{
+  "batchId": 101,
+  "sessionDate": "2026-05-15T09:00:00",
+  "duration": 60
+}
+
+RESPONSE DTO: ScheduleDTO
+----------------------------
+Fields:
+  - id (Long) - Schedule ID
+  - batchId (Long) - Batch ID
+  - sessionDate (LocalDateTime) - Session date/time
+  - duration (Integer) - Duration in minutes
+
+RESPONSE BODY EXAMPLE (Success - 200):
+{
+  "id": 1001,
+  "batchId": 101,
+  "sessionDate": "2026-05-15T09:00:00",
+  "duration": 60
+}
+
+----------------------------
+ENDPOINT: /schedule/{scheduleId}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - scheduleId (Long, Path Parameter) - Schedule ID
+
+RESPONSE DTO: ScheduleDTO
+
+----------------------------
+ENDPOINT: /schedule
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST: No body required
+
+RESPONSE DTO: List<ScheduleDTO>
+
+----------------------------
+ENDPOINT: /schedule/{scheduleId}/session-date
+METHOD: PUT
+AUTHORIZATION: ADMIN, TRAINER
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - scheduleId (Long, Path Parameter) - Schedule ID
+  - sessionDate (LocalDateTime, Query Parameter) - New session date
+
+RESPONSE DTO: ScheduleDTO
+
+----------------------------
+ENDPOINT: /schedule/batch
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH, ASSOCIATE
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST QUERY PARAMETERS:
+  - id (Long, Query Parameter) - Batch ID
+
+RESPONSE DTO: List<ScheduleDTO>
+
+----------------------------
+ENDPOINT: /enrollment
+METHOD: POST
+AUTHORIZATION: ADMIN
+STATUS CODES: 200 OK, 400 Bad Request
+----------------------------
+
+REQUEST DTO: EnrollmentDTO
+----------------------------
+Fields:
+  - associateId (Long) - Required, NotNull
+      Description: Associate ID
+      Example: 301
+
+  - batchId (Long) - Required, NotNull
+      Description: Batch ID
+      Example: 101
+
+  - status (Enum) - Optional
+      Description: Enrollment status
+      Values: ENROLLED, COMPLETED, DROPPED
+      Example: "ENROLLED"
+
+REQUEST BODY EXAMPLE:
+{
+  "associateId": 301,
+  "batchId": 101,
+  "status": "ENROLLED"
+}
+
+RESPONSE DTO: EnrollmentDTO
+----------------------------
+Fields:
+  - id (Long) - Enrollment ID
+  - associateId (Long) - Associate ID
+  - batchId (Long) - Batch ID
+  - status (String) - Enrollment status
+  - enrolledAt (LocalDateTime) - Enrollment timestamp
+
+RESPONSE BODY EXAMPLE (Success - 200):
+{
+  "id": 2001,
+  "associateId": 301,
+  "batchId": 101,
+  "status": "ENROLLED",
+  "enrolledAt": "2026-04-01T10:00:00"
+}
+
+----------------------------
+ENDPOINT: /enrollment/{id}
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - Enrollment ID
+
+RESPONSE DTO: EnrollmentDTO
+
+----------------------------
+ENDPOINT: /enrollment
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST: No body required
+
+RESPONSE DTO: List<EnrollmentDTO>
+
+----------------------------
+ENDPOINT: /enrollment/batch
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST QUERY PARAMETERS:
+  - id (Long, Query Parameter) - Batch ID
+
+RESPONSE DTO: List<EnrollmentDTO>
+
+----------------------------
+ENDPOINT: /enrollment/associate
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST QUERY PARAMETERS:
+  - id (Long, Query Parameter) - Associate ID
+
+RESPONSE DTO: EnrollmentDTO
+
+----------------------------
+ENDPOINT: /enrollment/{id}/status
+METHOD: PUT
+AUTHORIZATION: ADMIN
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - Enrollment ID
+  - val (Enum, Query Parameter) - New status: ENROLLED, COMPLETED, DROPPED
+
+RESPONSE DTO: EnrollmentDTO
+
+----------------------------
+ENDPOINT: /enrollment/status
+METHOD: GET
+AUTHORIZATION: ADMIN, TRAINER, TECH_LEAD, COACH
+STATUS CODES: 200 OK
+----------------------------
+
+REQUEST QUERY PARAMETERS:
+  - val (Enum, Query Parameter) - Status to filter: ENROLLED, COMPLETED, DROPPED
+
+RESPONSE DTO: List<EnrollmentDTO>
+
+----------------------------
+ENDPOINT: /enrollment/{id}
+METHOD: DELETE
+AUTHORIZATION: ADMIN
+STATUS CODES: 200 OK, 404 Not Found
+----------------------------
+
+REQUEST PARAMETERS:
+  - id (Long, Path Parameter) - Enrollment ID
+
+RESPONSE DTO: EnrollmentDTO
+
+================================================================================
+                           ERROR RESPONSE CODES
+================================================================================
+
+ErrorResponseDTO:
+---
+Fields:
+  - timestamp (LocalDateTime) - Error timestamp
+  - message (String) - Error message
+  - errorCode (String) - Error code
+  - path (String) - API endpoint path
+
+Common Error Codes:
+  U001 - User with ID does not exist
+  U002 - User with username already exists
+  U003 - User with email already exists
+  U004 - Invalid password
+  T001 - Token invalid or expired
+  R001 - Role not found
+  P001 - Project validation error
+  P404 - Project not found
+  S500 - Internal server error
+
+Example Error Response (404):
+{
+  "timestamp": "2026-04-16T15:00:00",
+  "message": "User with username: john_doe already exists",
+  "errorCode": "U002",
+  "path": "/auth/signup"
+}
+
+================================================================================
+                        COMMON VALIDATION RULES
+================================================================================
+
+Field Validations:
+
+@NotBlank / @NotNull:
+  - Field cannot be null or empty
+  - Example fields: username, email, password, title, etc.
+
+@Email:
+  - Field must be valid email format
+  - Example: "user@example.com"
+
+@Valid:
+  - Nested object validation
+  - Validates all constraints in nested DTOs
+
+Range Validations:
+  - Score fields: 0-100
+  - Duration: positive integers
+
+Enum Validations:
+  - AssessmentType: QUIZ, INTERVIEW
+  - AssessmentStatus: DRAFT, PUBLISHED, CLOSED
+  - BatchStatus: ACTIVE, INACTIVE
+  - EnrollmentStatus: ENROLLED, COMPLETED, DROPPED
+  - InterviewCategory: TECHNICAL, HR, BEHAVIOURAL
+  - ReviewType: TECH, SCRUM
+
+URL Validations:
+  - Repository URLs must be valid HTTP/HTTPS URLs
+
+================================================================================
+                            END OF DOCUMENTATION
+================================================================================
+Generated: May 12, 2026
+All endpoints include proper authentication and authorization checks
+Refer to individual service Swagger documentation for more details
+================================================================================
+
