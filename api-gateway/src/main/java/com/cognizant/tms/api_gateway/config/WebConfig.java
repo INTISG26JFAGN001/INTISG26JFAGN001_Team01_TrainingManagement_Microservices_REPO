@@ -166,6 +166,7 @@ public class WebConfig {
                 // Project Controller
                 auth.requestMatchers(HttpMethod.POST, "/projects/submitProject").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.GET, "/projects/getProjects").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
+                auth.requestMatchers(HttpMethod.GET, "/projects/associate/{associateId}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.GET, "/projects/{projectId}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.PUT, "/projects/update/{projectId}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.DELETE, "/projects/delete/{projectId}").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");

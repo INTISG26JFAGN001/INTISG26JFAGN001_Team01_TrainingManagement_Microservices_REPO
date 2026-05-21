@@ -31,6 +31,11 @@ public class ProjectDAOImpl implements IProjectDAO {
     }
 
     @Override
+    public List<Project> findByAssociateId(Long associateId) {
+        return projectRepository.findByAssociateId(associateId);
+    }
+
+    @Override
     public Project updateProject(Long id, Project project) {
         if (projectRepository.existsById(id)) {
             project.setId(id);

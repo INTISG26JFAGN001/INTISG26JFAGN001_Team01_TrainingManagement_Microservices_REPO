@@ -55,6 +55,16 @@ public class ProjectService implements IProjectService {
     }
 
     @Override
+    public List<ProjectResponseDTO> getProjectsByAssociateId(Long associateId) {
+        log.info("Fetching projects for associateId={}", associateId);
+        List<Project> projects = projectDAO.findByAssociateId(associateId);
+        log.debug("Found {} projects for associateId={}", projects.size(), associateId);
+        return projects.stream()
+                .map(projectMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void deleteProject(Long id) {
         log.info("Deleting project with id={}", id);
         Project project = projectDAO.findById(id);
@@ -75,6 +85,7 @@ public class ProjectService implements IProjectService {
             existingProject.setTitle(request.title());
             existingProject.setBatchId(request.batchId());
             existingProject.setRepoUrl(request.repoUrl());
+            if (request.associateId() != null) existingProject.setAssociateId(request.associateId());
 
             Project updatedProject = projectDAO.saveProject(existingProject);
             log.info("Project with id={} updated successfully", updatedProject.getId());
