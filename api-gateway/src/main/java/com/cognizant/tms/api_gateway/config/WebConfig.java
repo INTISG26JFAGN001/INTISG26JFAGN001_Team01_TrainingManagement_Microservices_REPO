@@ -92,7 +92,7 @@ public class WebConfig {
                 auth.requestMatchers(HttpMethod.GET, "/batches/status").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH");
                 auth.requestMatchers(HttpMethod.GET, "/batches/course").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH");
                 auth.requestMatchers(HttpMethod.GET, "/batches/trainer").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH");
-                auth.requestMatchers(HttpMethod.GET, "/batches/{id}/details").hasAnyRole("ADMIN","TRAINER");
+                auth.requestMatchers(HttpMethod.GET, "/batches/{id}/details").hasAnyRole("ADMIN","TRAINER","ASSOCIATE");
                 auth.requestMatchers(HttpMethod.GET, "/batches/{batchId}/courses").hasAnyRole("ADMIN","TRAINER","TECH_LEAD","COACH","ASSOCIATE");
 
                 // Enrollment Controller
