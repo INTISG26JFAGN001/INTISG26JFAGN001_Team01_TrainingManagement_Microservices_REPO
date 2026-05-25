@@ -827,9 +827,11 @@ import java.util.stream.Collectors;
                         BatchDTO dto = new BatchDTO();
                         dto.setId(batch.getBatchId());
                         dto.setTrainerId(batch.getTrainerId());
+                        dto.setStatus(batch.getStatus());
+                        dto.setStartDate(batch.getStartDate());
+                        dto.setEndDate(batch.getEndDate());
                         dto.setCourseIds(courseIds);
                         dto.setCourseNames(courseNames);
-                        dto.setStatus(batch.getStatus());
                         return dto;
                     })
                     .toList();

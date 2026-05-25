@@ -21,6 +21,9 @@ public class Project {
     @Column(name="batch_id")
     private Long batchId;
 
+    @Column(name="associate_id")
+    private Long associateId;
+
     @Column(name="title")
     private String title;
 

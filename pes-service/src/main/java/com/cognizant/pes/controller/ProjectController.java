@@ -138,6 +138,28 @@ public class ProjectController {
     }
 
     @Operation(
+            summary = "Get Projects by Associate",
+            description = "Retrieves all projects submitted by a specific associate."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Projects retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProjectResponseDTO.class)
+                    )
+            )
+    })
+    @GetMapping("/associate/{associateId}")
+    public ResponseEntity<List<ProjectResponseDTO>> getProjectsByAssociate(
+            @PathVariable Long associateId) {
+
+        List<ProjectResponseDTO> projects = projectService.getProjectsByAssociateId(associateId);
+        return ResponseEntity.ok(projects);
+    }
+
+    @Operation(
             summary = "Update Project",
             description = "Updates an existing project identified by project ID. " +
                     "The request body contains updated project details."

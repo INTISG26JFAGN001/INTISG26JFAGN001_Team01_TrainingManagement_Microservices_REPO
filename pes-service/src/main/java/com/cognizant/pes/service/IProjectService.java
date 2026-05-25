@@ -10,6 +10,7 @@ public interface IProjectService {
     public ProjectResponseDTO saveProject(ProjectRequestDTO request);
     public ProjectResponseDTO getProjectById(Long id);
     public List<ProjectResponseDTO> getAllProjects();
+    public List<ProjectResponseDTO> getProjectsByAssociateId(Long associateId);
     public ProjectResponseDTO updateProject(Long id, ProjectRequestDTO request) throws ResourceNotFoundException;
     public void deleteProject(Long id);
 }
